@@ -1,13 +1,18 @@
 import React from "react";
 
 const questions = [
-  "Rider & pillion wear helmet (2W)",
-  "Car: seat belt worn",
-  "Excessive honking",
-  "Follow traffic signal",
-  "Stop at stop line (red signal)",
-  "Use cell phone while riding/driving",
-  "Frequently changed lanes"
+  "If on a bike or scooter, did everyone wear a helmet?",
+  "If in a car, did everyone wear a seatbelt?",
+  "Did the driver honk too much?",
+  "Did the driver follow traffic lights?",
+  "At a red light, did the driver stop at the white line?",
+  "Did the driver use a phone while driving?",
+  "Did the driver keep changing lanes?",
+  "Did the driver go into a \"No Entry\" road?",
+  "Did the driver stop for people walking (pedestrians)?",
+  "If in an auto, were too many people sitting inside?",
+  "If on a two-wheeler, were three people riding on it?",
+  "Did your driver have a license and insurance?",
 ];
 
 const rides = ["ALL RIDES", "Ride1", "Ride2", "Ride3", "Ride4", "Ride5", "Ride6", "Ride7"];
@@ -49,4 +54,4 @@ const QuestionMatrix = () => (
   </div>
 );
 
-export default QuestionMatrix; 
+export default QuestionMatrix;

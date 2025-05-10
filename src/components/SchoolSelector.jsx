@@ -16,7 +16,7 @@ const SchoolSelector = ({
 }) => (
   <div className="flex gap-4">
     <div className="flex-1">
-      <label className="block text-gray-700 mb-1">School name</label>
+      <label className="block text-gray-700 mb-1 mt-[20px] font-semibold">School name</label>
       <input
         className="w-full border p-2 rounded-lg"
         placeholder="School name"
@@ -25,7 +25,7 @@ const SchoolSelector = ({
       />
     </div>
     <div className="flex-1">
-      <label className="block text-gray-700 mb-1">Chapter</label>
+      <label className="block text-gray-700 mb-1 mt-[20px] font-semibold">Chapter</label>
       <select
         className="w-full border p-2 rounded-lg"
         value={selectedChapter}
@@ -39,4 +39,4 @@ const SchoolSelector = ({
   </div>
 );
 
-export default SchoolSelector; 
+export default SchoolSelector;

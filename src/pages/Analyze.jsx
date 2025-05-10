@@ -28,17 +28,21 @@ const Analyze = () => {
             selectedSchool={selectedSchool}
             setSelectedSchool={setSelectedSchool}
           />
-          {/* Responses and boxes */}
-          <div className="flex items-center gap-4">
-            <div className="flex-1">
-              <label className="block text-gray-700 mb-1">Responses</label>
+          {/* Responses input and boxes aligned with matrix */}
+          <div className="flex items-end gap-4 mb-2">
+            <div className="flex flex-col w-[200px]">
+              <label className="block text-gray-700 mb-1 font-semibold">
+                Responses
+              </label>
               <input
-                className="w-full border p-2 rounded-lg"
+                className="border p-2 rounded-lg"
                 placeholder="Responses"
                 disabled
               />
             </div>
-            <ResponseBoxes count={7} />
+            <div className="flex-1">
+              <ResponseBoxes count={8} />
+            </div>
           </div>
           {/* Main matrix */}
           <QuestionMatrix />

@@ -1,7 +1,7 @@
 import React from "react";
 
 const ResponseBoxes = ({ count }) => (
-  <div className="flex gap-3">
+  <div className="flex gap-10 justify-end">
     {Array.from({ length: count }).map((_, idx) => (
       <div
         key={idx}
@@ -11,4 +11,4 @@ const ResponseBoxes = ({ count }) => (
   </div>
 );
 
-export default ResponseBoxes; 
+export default ResponseBoxes;
