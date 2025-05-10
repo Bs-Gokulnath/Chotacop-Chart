@@ -4,6 +4,7 @@ import Signin from './auth/signin'
 import Signup from './auth/signup'
 import ChotaCopPage from './pages/Homepage'
 import Chart from './pages/Chart'
+import Analyze from './pages/Analyze'
 
 function App() {
 
@@ -14,6 +15,7 @@ function App() {
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/chart" element={<Chart />} />
+          <Route path="/analyze" element={<Analyze />} />
       </Routes>
     </BrowserRouter>
   )
