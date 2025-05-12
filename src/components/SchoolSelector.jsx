@@ -22,15 +22,6 @@ const SchoolSelector = ({
   return (
   <div className="flex gap-4">
     <div className="flex-1">
-      <label className="block text-gray-700 mb-1 mt-[20px] font-semibold">School name</label>
-      <input
-        className="w-full border p-2 rounded-lg"
-        placeholder="School name"
-        value={selectedSchool}
-        onChange={e => setSelectedSchool(e.target.value)}
-      />
-    </div>
-    <div className="flex-1">
       <label className="block text-gray-700 mb-1 mt-[20px] font-semibold">Chapter</label>
       {/* Check if chapter is from localStorage */}
       {localStorage.getItem("user") ? (
@@ -50,6 +41,15 @@ const SchoolSelector = ({
           ))}
         </select>
       )}
+    </div>
+    <div className="flex-1">
+      <label className="block text-gray-700 mb-1 mt-[20px] font-semibold">School name</label>
+      <input
+        className="w-full border p-2 rounded-lg"
+        placeholder="School name"
+        value={selectedSchool}
+        onChange={e => setSelectedSchool(e.target.value)}
+      />
     </div>
   </div>
   );
