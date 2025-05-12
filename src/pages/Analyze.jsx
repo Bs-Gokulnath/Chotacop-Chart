@@ -31,9 +31,9 @@ const Analyze = () => {
           {/* Responses input and boxes aligned with matrix */}
           <div className="flex items-end gap-4 mb-2">
             <div className="flex flex-col w-[200px]">
-              <label className="block text-gray-700 mb-1 font-semibold">
+              {/* <label className="block text-gray-700 mb-1 font-semibold">
                 Responses
-              </label>
+              </label> */}
               <input
                 className="border p-2 rounded-lg"
                 placeholder="Responses"

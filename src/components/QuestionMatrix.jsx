@@ -43,7 +43,9 @@ const QuestionMatrix = () => (
             <tr key={qIdx}>
               {rides.map((_, rIdx) => (
                 <td key={rIdx} className="py-2 text-center">
-                  <span className="inline-block w-5 h-5 border-2 border-black rounded-full"></span>
+                  <span className="inline-block w-5 h-5 border-2 border-black rounded-full flex items-center justify-center text-xs">
+                    {rIdx + 1}
+                  </span>
                 </td>
               ))}
             </tr>

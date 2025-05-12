@@ -1,19 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 const chapters = ["VELLORE", "BHOPAL", "SALEM"];
-const velloreSchools = [
-  "MOTHER SCHOOL",
-  "VANI VIDYALAYA SCHOOL",
-  "RBMS SCHOOL",
-  "SHRISHTI SCHOOL"
-];
 
 const SchoolSelector = ({
   selectedChapter,
   setSelectedChapter,
   selectedSchool,
   setSelectedSchool
-}) => (
+}) => {
+  // Get chapter from localStorage if available
+  useEffect(() => {
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      const { chapter } = JSON.parse(userData);
+      if (chapter) {
+        setSelectedChapter(chapter);
+      }
+    }
+  }, [setSelectedChapter]);
+
+  return (
   <div className="flex gap-4">
     <div className="flex-1">
       <label className="block text-gray-700 mb-1 mt-[20px] font-semibold">School name</label>
@@ -26,17 +32,27 @@ const SchoolSelector = ({
     </div>
     <div className="flex-1">
       <label className="block text-gray-700 mb-1 mt-[20px] font-semibold">Chapter</label>
-      <select
-        className="w-full border p-2 rounded-lg"
-        value={selectedChapter}
-        onChange={e => setSelectedChapter(e.target.value)}
-      >
-        {chapters.map(ch => (
-          <option key={ch} value={ch}>{ch}</option>
-        ))}
-      </select>
+      {/* Check if chapter is from localStorage */}
+      {localStorage.getItem("user") ? (
+        <input
+          className="w-full border p-2 rounded-lg bg-gray-100"
+          value={selectedChapter}
+          readOnly
+        />
+      ) : (
+        <select
+          className="w-full border p-2 rounded-lg"
+          value={selectedChapter}
+          onChange={e => setSelectedChapter(e.target.value)}
+        >
+          {chapters.map(ch => (
+            <option key={ch} value={ch}>{ch}</option>
+          ))}
+        </select>
+      )}
     </div>
   </div>
-);
+  );
+};
 
 export default SchoolSelector;
