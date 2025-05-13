@@ -12,12 +12,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-          <Route path='/' element={<ChotaCopPage />} />
+          {/* <Route path='/' element={<ChotaCopPage />} /> */}
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
-          <Route path="/chart" element={<Chart />} />
+          {/* <Route path="/chart" element={<Chart />} /> */}
           <Route path="/analyze" element={<Analyze />} />
-          <Route path="/admin" element={<SuperAdmin />} />
+          {/* <Route path="/admin" element={<SuperAdmin />} /> */}
 
       </Routes>
     </BrowserRouter>
