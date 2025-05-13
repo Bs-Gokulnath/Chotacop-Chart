@@ -6,7 +6,7 @@ import Header from "../components/Header";
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [step, setStep] = useState("email");
-  const [otp, setOtp] = useState(["", "", ""]); // Only 3 digits
+  const [otp, setOtp] = useState(["", "", ""]);
   const [generatedOtp, setGeneratedOtp] = useState("");
   const [timer, setTimer] = useState(0);
   const [chapter, setChapter] = useState("");
@@ -23,7 +23,7 @@ const Signin = () => {
   }, [timer]);
 
   const generateRandomOtp = () => {
-    return Math.floor(100 + Math.random() * 900).toString(); // 3-digit OTP
+    return Math.floor(100 + Math.random() * 900).toString();
   };
 
   const sendOtp = async () => {
@@ -56,8 +56,8 @@ const Signin = () => {
       const response = await axios.post("http://148.135.137.228:5001/signin", { email });
 
       if (response.data?.email) {
-        setChapter(response.data.chapter_name);
-        setUserId(response.data.user_id);
+        setChapter(response.data.chapter); // ✅ Corrected
+        setUserId(response.data.user_id);  // ✅ Consistent with backend
 
         await sendOtp();
         setStep("otp");
@@ -92,19 +92,22 @@ const Signin = () => {
     if (enteredOtp.length !== 3) return alert("Enter 3-digit OTP.");
     if (enteredOtp !== generatedOtp) return alert("Invalid OTP.");
 
-    localStorage.setItem("user", JSON.stringify({ email, chapter, userId }));
+    // ✅ Save all user info to localStorage
+    localStorage.setItem(
+      "user",
+      JSON.stringify({ email, userId, chapter })
+    );
+
     alert("Sign-in successful!");
     navigate("/analyze");
   };
 
   return (
     <div className="min-h-screen bg-[#fdf5eb] flex flex-col">
-      {/* Header */}
       <div className="w-full z-10">
         <Header />
       </div>
 
-      {/* Centered form */}
       <div className="flex flex-grow items-center justify-center px-4 py-10 mt-[-130px]">
         <form
           onSubmit={step === "email" ? handleEmailSubmit : handleVerifyOtp}

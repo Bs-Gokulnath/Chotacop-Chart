@@ -1,57 +1,76 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
-const chapters = ["VELLORE", "BHOPAL", "SALEM"];
+const chapters = ["Vellore", "Bhopal", "Salem"]; // Consistent with Signin.jsx
 
 const SchoolSelector = ({
   selectedChapter,
   setSelectedChapter,
   selectedSchool,
-  setSelectedSchool
+  setSelectedSchool,
 }) => {
-  // Get chapter from localStorage if available
+  const [chapterChecked, setChapterChecked] = useState(false);
+
   useEffect(() => {
     const userData = localStorage.getItem("user");
-    if (userData) {
-      const { chapter } = JSON.parse(userData);
-      if (chapter) {
-        setSelectedChapter(chapter);
+    try {
+      if (userData) {
+        const parsed = JSON.parse(userData);
+        if (parsed?.chapter && chapters.includes(parsed.chapter)) {
+          setSelectedChapter(parsed.chapter);
+        } else if (!chapterChecked) {
+          alert("Chapter not found. Please sign in first.");
+          setChapterChecked(true);
+        }
+      } else if (!chapterChecked) {
+        alert("Please sign in first.");
+        setChapterChecked(true);
+      }
+    } catch (error) {
+      console.error("Failed to parse user data:", error);
+      if (!chapterChecked) {
+        alert("Error reading user data. Please sign in again.");
+        setChapterChecked(true);
       }
     }
-  }, [setSelectedChapter]);
+  }, [setSelectedChapter, chapterChecked]);
 
   return (
-  <div className="flex gap-4">
-    <div className="flex-1">
-      <label className="block text-gray-700 mb-1 mt-[20px] font-semibold">Chapter</label>
-      {/* Check if chapter is from localStorage */}
-      {localStorage.getItem("user") ? (
+    <div className="flex items-end gap-4 mt-[10px] mb-8">
+      {/* Chapter Field (Read-only) */}
+      <div>
+        <label className="block text-sm font-medium">Chapter</label>
         <input
-          className="w-full border p-2 rounded-lg bg-gray-100"
-          value={selectedChapter}
+          className="mt-1 p-2 border rounded-lg w-[570px] bg-gray-100 text-gray-700"
+          value={selectedChapter || ""}
           readOnly
+          disabled
         />
-      ) : (
-        <select
-          className="w-full border p-2 rounded-lg"
-          value={selectedChapter}
-          onChange={e => setSelectedChapter(e.target.value)}
-        >
-          {chapters.map(ch => (
-            <option key={ch} value={ch}>{ch}</option>
-          ))}
-        </select>
-      )}
+      </div>
+
+      {/* School Name Field */}
+      <div>
+        <label className="block text-sm font-medium">School</label>
+        <input
+          className="mt-1 p-2 border rounded-lg w-[570px]"
+          placeholder="Enter school name"
+          value={selectedSchool}
+          onChange={(e) => setSelectedSchool(e.target.value)}
+        />
+      </div>
+
+      {/* Get Analysis Button */}
+      <button
+        className={`px-4 py-2 rounded-lg ${
+          selectedSchool
+            ? "bg-blue-500 text-white hover:bg-blue-600"
+            : "bg-gray-300 text-gray-500 cursor-not-allowed"
+        }`}
+        disabled={!selectedSchool}
+        onClick={() => alert("Analysis triggered!")} // Placeholder action
+      >
+        Get Analysis
+      </button>
     </div>
-    <div className="flex-1">
-      <label className="block text-gray-700 mb-1 mt-[20px] font-semibold">School name</label>
-      <input
-        className="w-full border p-2 rounded-lg"
-        placeholder="School name"
-        value={selectedSchool}
-        onChange={e => setSelectedSchool(e.target.value)}
-      />
-    </div>
-  </div>
   );
 };
 

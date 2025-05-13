@@ -16,9 +16,10 @@ const CHAPTERS = [
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [chapter, setChapter] = useState("");
-  const [otp, setOtp] = useState(["", "", ""]); // 3-digit OTP
-  const [step, setStep] = useState("form"); // 'form' or 'otp'
+  const [otp, setOtp] = useState(["", "", ""]);
+  const [step, setStep] = useState("form");
   const [generatedOtp, setGeneratedOtp] = useState("");
+  const [error, setError] = useState("");
   const inputsRef = useRef([]);
   const navigate = useNavigate();
 
@@ -39,40 +40,60 @@ const Signup = () => {
 
   const sendOtp = async (e) => {
     e.preventDefault();
-    if (!email || !chapter) return alert("Please fill all fields.");
+    if (!email || !chapter) {
+      setError("Please fill all fields.");
+      return;
+    }
+    setError("");
     try {
       const otpToSend = generateRandomOtp();
       setGeneratedOtp(otpToSend);
       console.log("Generated OTP (for dev):", otpToSend);
-      await axios.post(
+
+      const response = await axios.post(
         "http://148.135.137.228:5001/send-otp",
         { email, otp: otpToSend },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" }, timeout: 10000 }
       );
-      alert("OTP sent to your email.");
-      setStep("otp");
+
+      if (response.data.message === "OTP sent successfully") {
+        alert("OTP sent to your email.");
+        setStep("otp");
+      } else {
+        throw new Error("Unexpected response from server");
+      }
     } catch (err) {
       console.error("Error sending OTP:", err);
-      alert("Failed to send OTP: " + (err.response?.data?.detail || err.message));
+      if (err.code === "ERR_NETWORK") {
+        setError("Cannot connect to the server. Please check your network or try again later.");
+      } else if (err.response?.data?.detail === "Email already registered") {
+        setError("Email already registered. Please use a different email or sign in.");
+      } else {
+        setError(`Failed to send OTP: ${err.response?.data?.detail || err.message}`);
+      }
     }
   };
 
   const verifyOtpAndSignup = async (e) => {
     e.preventDefault();
     const enteredOtp = otp.join("");
-    if (enteredOtp.length !== 3) return alert("Enter the complete 3-digit OTP");
+    if (enteredOtp.length !== 3) {
+      setError("Enter the complete 3-digit OTP");
+      return;
+    }
     if (enteredOtp !== generatedOtp) {
-      alert("Invalid OTP. Please try again.");
+      setError("Invalid OTP. Please try again.");
       setOtp(["", "", ""]);
       inputsRef.current[0]?.focus();
       return;
     }
+    setError("");
 
     try {
       const response = await axios.post(
         "http://148.135.137.228:5001/signup",
         { email, chapter_name: chapter },
-        { headers: { "Content-Type": "application/json" } }
+        { headers: { "Content-Type": "application/json" }, timeout: 10000 }
       );
 
       if (response.status === 200) {
@@ -86,7 +107,7 @@ const Signup = () => {
       }
     } catch (err) {
       console.error("Signup error:", err);
-      alert("Signup failed: " + (err.response?.data?.detail || err.message));
+      setError(`Signup failed: ${err.response?.data?.detail || err.message}`);
     }
   };
 
@@ -99,6 +120,10 @@ const Signup = () => {
           className="bg-[#fdf5eb] shadow-xl p-8 rounded-xl w-full max-w-md space-y-6"
         >
           <h2 className="text-2xl font-bold text-center text-gray-800 mt-[-20px]">Sign Up</h2>
+
+          {error && (
+            <div className="text-red-500 text-sm text-center">{error}</div>
+          )}
 
           {step === "form" && (
             <>
