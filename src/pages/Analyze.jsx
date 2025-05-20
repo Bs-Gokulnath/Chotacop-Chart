@@ -21,17 +21,7 @@ const Analyze = () => {
             selectedSchool={selectedSchool}
             setSelectedSchool={setSelectedSchool}
           />
-          {/* Responses and Matrix */}
-          {/* <div className="flex items-end gap-4 mb-2">
-            <div className="flex flex-col w-[220px]">
-              <div className="rounded-lg w-full font-medium">
-                Total Responses
-              </div>
-            </div>
-            <div className="flex-1">
-              <ResponseBoxes count={8} />
-            </div>
-          </div> */}
+
         </div>
       </div>
     </div>
