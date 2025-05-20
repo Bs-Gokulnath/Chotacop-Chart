@@ -17,7 +17,7 @@ function App() {
           <Route path="/signup" element={<Signup />} />
           {/* <Route path="/chart" element={<Chart />} /> */}
           <Route path="/analyze" element={<Analyze />} />
-          {/* <Route path="/admin" element={<SuperAdmin />} /> */}
+          <Route path="/superadmin" element={<SuperAdmin />} />
 
       </Routes>
     </BrowserRouter>
