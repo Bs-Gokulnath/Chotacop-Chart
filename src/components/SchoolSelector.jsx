@@ -9,11 +9,10 @@ const API_ENDPOINT = "http://148.135.137.228:5001/chapter-observation";
 const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, setSelectedSchool }) => {
   const [schools, setSchools] = useState([]);
   const [userId, setUserId] = useState("");
-  // selectedChapter and selectedSchool are now passed as props from the parent
   const [analysisData, setAnalysisData] = useState(null);
   const [isSpecialUser, setIsSpecialUser] = useState(false);
-  const [allChaptersData, setAllChaptersData] = useState([]); // To store the array of chapter data for the special user
-  const [chapterFetchedForStandardUser, setChapterFetchedForStandardUser] = useState(false); // Track if chapter is fetched for standard user
+  const [allChaptersData, setAllChaptersData] = useState([]);
+  const [chapterFetchedForStandardUser, setChapterFetchedForStandardUser] = useState(false);
 
   // Effect to get user ID and determine user type
   useEffect(() => {
@@ -32,28 +31,23 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
           setAnalysisData(null);
           setAllChaptersData([]);
           setSchools([]);
-          setChapterFetchedForStandardUser(false); // Reset fetch status
+          setChapterFetchedForStandardUser(false);
         } else {
           console.warn("User data found in local storage but no userId.");
           alert("User ID not found. Please sign in again.");
-          // Optionally clear local storage or prompt re-signin
         }
       } else {
         alert("Please sign in first.");
-        // Optionally redirect to sign-in page
       }
     } catch (error) {
       console.error("Failed to parse user data:", error);
-      alert("Error reading user data. Please sign in again.");
-      // Optionally clear local storage or prompt re-signin
+        alert("Error reading user data. Please sign in again.");
     }
-     // This effect should run once on mount and possibly if local storage changes (though not explicitly watching local storage here)
-  }, []); // Empty dependency array means this effect runs once on mount
+  }, []);
 
   // Effect to fetch initial data (chapters and schools) based on user ID and type
   useEffect(() => {
     if (!userId) {
-      // If user is not loaded, clear relevant states and stop
       setSchools([]);
       setSelectedChapter("");
       setSelectedSchool("");
@@ -63,26 +57,21 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
       return;
     }
 
-     // Prevent re-fetching for standard user if chapter is already set
     if (!isSpecialUser && selectedChapter && chapterFetchedForStandardUser) {
         return;
     }
-
 
     axios
       .post(API_ENDPOINT, {
         user_id: userId,
       })
       .then((response) => {
-        const responseData = response.data; // Use the full response data to check structure
+        const responseData = response.data;
 
         if (isSpecialUser) {
-          // For special user, responseData.data is an array of chapter objects
           const chaptersData = responseData?.data;
           if (Array.isArray(chaptersData)) {
-            setAllChaptersData(chaptersData); // Store the array of chapter data
-
-            // Populate chapter dropdown and set the first chapter as selected
+            setAllChaptersData(chaptersData);
             const chapters = chaptersData.map((item) => item.chapter);
             if (chapters.length > 0) {
               setSelectedChapter(chapters[0]);
@@ -95,26 +84,21 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
             setAllChaptersData([]);
             setSelectedChapter("");
           }
-
         } else {
-          // For standard user, responseData has 'chapter' and 'data' fields at top level
            if (responseData && typeof responseData === 'object' && responseData.chapter && responseData.data && typeof responseData.data === 'object') {
              const chapterName = responseData.chapter;
              const schoolData = responseData.data;
 
-             setSelectedChapter(chapterName); // Set the user's chapter
-             setChapterFetchedForStandardUser(true); // Mark chapter as fetched
+             setSelectedChapter(chapterName);
+             setChapterFetchedForStandardUser(true);
 
-             // Populate schools from the data object keys
              const schoolNames = Object.keys(schoolData);
              setSchools(schoolNames);
-             // Optionally select the first school if available
-             if (schoolNames.length > 0) {
-                setSelectedSchool(schoolNames[0]);
+              if (schoolNames.length > 0) {
+                setSelectedSchool(schoolNames[0]); // Auto-select first school for standard user
              } else {
                  setSelectedSchool("");
              }
-
            } else {
              console.error("API response for standard user is not in expected format:", responseData);
              alert("Error fetching chapter and school data for your user.");
@@ -131,96 +115,163 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
         setSelectedSchool("");
         setAllChaptersData([]);
       });
-  }, [userId, isSpecialUser]); // Depend on userId and isSpecialUser
+  }, [userId, isSpecialUser]);
 
   // Effect to update schools when selected chapter changes (only for special user)
+  // and to trigger analysis data fetch when selected school changes
   useEffect(() => {
-      if (isSpecialUser && selectedChapter && allChaptersData.length > 0) {
-          const chapterData = allChaptersData.find(item => item.chapter === selectedChapter);
-          if (chapterData?.data) {
-              const schoolsForChapter = Object.keys(chapterData.data);
-              setSchools(schoolsForChapter);
-               // Clear selected school if the previously selected school is not in the new list
-              if (selectedSchool && !schoolsForChapter.includes(selectedSchool)) {
-                  setSelectedSchool('');
-              } else if (!selectedSchool && schoolsForChapter.length > 0) {
-                   // Optionally auto-select the first school
-                   setSelectedSchool(schoolsForChapter[0]);
-              }
-          } else {
-              setSchools([]);
-              setSelectedSchool('');
-          }
-      } else if (!isSpecialUser && selectedChapter && schools.length === 0) {
-          // This case might occur if schools were not correctly populated for a standard user initially
-          // Re-fetch schools for the selected chapter if needed, or rely on the initial fetch
-          // For the given standard user API response, schools are available with chapter, so initial fetch should be enough.
-           // Let's add a check here in case the initial fetch missed schools for some reason
-           // (Though based on the provided JSON, it shouldn't)
-           // console.log("Standard user: selected chapter changed, but schools were not loaded. Investigate API response structure.");
-           // The initial fetch logic should handle this, so commenting this out to avoid potential infinite loops
-      } else if (!selectedChapter) {
-         // selectedChapter is empty, clear schools
+      // Clear analysis data and schools if chapter is changed or becomes empty
+       if (!selectedChapter) {
          setSchools([]);
          setSelectedSchool('');
+         setAnalysisData(null);
+         return;
       }
-       setAnalysisData(null); // Clear analysis data whenever chapter or school data changes
-  }, [selectedChapter, isSpecialUser, allChaptersData, selectedSchool]); // Depend on selectedChapter, isSpecialUser, allChaptersData, and selectedSchool
 
-  const handleGetAnalysis = () => {
-    if (!selectedSchool || !selectedChapter || !userId) {
-        alert("Please select a chapter and school.");
-        return;
-    }
-
-     // Call the API to get analysis data for the selected school
-    axios
-      .post(API_ENDPOINT, {
-        user_id: userId,
-        school_name: selectedSchool,
-         // Include chapter in the request payload if the API requires it for analysis
-         chapter: selectedChapter, // API might need chapter as well
-      })
-      .then((response) => {
-         const responseData = response.data?.data; // This structure might vary
-
-          if (isSpecialUser) {
-              // For special user, find the selected chapter and then the school data within it
+      if (isSpecialUser) {
+          if (allChaptersData.length > 0) {
               const chapterData = allChaptersData.find(item => item.chapter === selectedChapter);
-              if (chapterData?.data?.[selectedSchool]) {
-                  // The actual analysis data for the matrix is inside the school object
-                  setAnalysisData(chapterData.data[selectedSchool]);
+              if (chapterData?.data) {
+                  const schoolsForChapter = Object.keys(chapterData.data);
+                  // Add 'All Schools' option at the beginning
+                  setSchools(['All Schools', ...schoolsForChapter]);
+                  // If 'All Schools' was previously selected, keep it selected, otherwise clear or select first real school
+                  if (selectedSchool === 'All Schools') {
+                      // Keep 'All Schools' selected
+                  } else if (selectedSchool && !schoolsForChapter.includes(selectedSchool)) {
+                      setSelectedSchool('');
+                  } else if (!selectedSchool && schoolsForChapter.length > 0) {
+                       // Optionally auto-select the first school or 'All Schools'
+                       setSelectedSchool('All Schools'); // Auto-select 'All Schools' by default
+                  }
               } else {
-                  alert("No analysis data found for the selected school in the special user's data.");
-                  setAnalysisData(null);
-              }
-          } else {
-              // For standard user, assume responseData[selectedSchool] holds the analysis data directly
-               // Based on the standard user API response, responseData here should be the schools object
-               if (responseData && responseData[selectedSchool]) {
-                setAnalysisData(responseData[selectedSchool]);
-              } else {
-                console.warn("Unexpected API response structure for standard user analysis or no data:", responseData);
-                alert("No analysis data found for the selected school.");
-                 setAnalysisData(null);
+                  setSchools([]);
+                  setSelectedSchool('');
               }
           }
+      } else {
+          // For standard users, schools were already set in the initial fetch effect
+          // based on their assigned chapter. Add 'All Schools' to their limited list
+          const schoolsForChapter = Object.keys(schools);
+           if (schoolsForChapter.length > 0) {
+               setSchools(['All Schools', ...schoolsForChapter]);
+               // Auto-select 'All Schools' for standard users if they have schools
+               setSelectedSchool('All Schools');
+           } else {
+                setSchools([]);
+                setSelectedSchool('');
+           }
+      }
 
-      })
-      .catch((error) => {
-        console.error("Error fetching analysis data:", error);
-        alert("Failed to fetch analysis data.");
-        setAnalysisData(null);
-      });
-  };
+       // *** Trigger analysis data fetch when selectedSchool changes and is not empty ***
+       if (selectedSchool && selectedChapter && userId) {
+           if (selectedSchool === 'All Schools') {
+               // Aggregate data for all schools in the selected chapter
+               let aggregatedData = [];
+               const chapterData = isSpecialUser
+                ? allChaptersData.find(item => item.chapter === selectedChapter)
+                : { data: schools.reduce((acc, school) => { // Assuming schools state for standard user holds the single school's data structure
+                     if (school !== 'All Schools' && analysisData && analysisData.length > 0) { // Use existing analysisData for the single school as source
+                          acc[school] = analysisData; // This might need adjustment based on how standard user data is structured
+                     } else if (school !== 'All Schools') {
+                         // Fallback if analysisData isn't structured as expected, might need re-fetching
+                         console.warn("Analysis data not available for aggregation in standard user mode.");
+                         // Consider refetching the chapter data here to get the school's data
+                     }
+                     return acc;
+                   }, {}) };
 
+               if (chapterData?.data) {
+                   const schoolsToAggregate = Object.keys(chapterData.data).filter(school => school !== 'All Schools');
+                   if (schoolsToAggregate.length > 0) {
+                       const firstSchoolData = chapterData.data[schoolsToAggregate[0]];
+                       if (Array.isArray(firstSchoolData)) {
+                            // Initialize aggregated data structure based on questions from the first school
+                           aggregatedData = firstSchoolData.map(q => ({ q: q.q, yes: 0, no: 0 }));
+
+                           // Sum up yes/no for each question across all schools
+                           schoolsToAggregate.forEach(schoolName => {
+                               const schoolAnalysis = chapterData.data[schoolName];
+                                if (Array.isArray(schoolAnalysis)) {
+                                    schoolAnalysis.forEach((question, qIdx) => {
+                                        if (aggregatedData[qIdx]) {
+                                            aggregatedData[qIdx].yes += question.yes || 0;
+                                            aggregatedData[qIdx].no += question.no || 0;
+                                        }
+                                    });
+                                }
+                           });
+                            setAnalysisData(aggregatedData);
+                       } else {
+                            console.error("Unexpected data structure for school analysis data during aggregation.");
+                            setAnalysisData(null);
+                       }
+                   } else {
+                        // No schools to aggregate
+                        setAnalysisData(null);
+                   }
+               } else {
+                   // No chapter data found for aggregation
+                   setAnalysisData(null);
+               }
+
+           } else {
+               // Fetch data for a specific school (existing logic)
+                axios
+                  .post(API_ENDPOINT, {
+                    user_id: userId,
+                    school_name: selectedSchool,
+                     chapter: selectedChapter,
+                  })
+                  .then((response) => {
+                     const responseData = response.data?.data; // This structure might vary
+
+                      if (isSpecialUser) {
+                          const chapterData = allChaptersData.find(item => item.chapter === selectedChapter);
+                          if (chapterData?.data?.[selectedSchool]) {
+                              setAnalysisData(chapterData.data[selectedSchool]);
+                          } else {
+                              // alert("No analysis data found for the selected school in the special user's data.");
+                              setAnalysisData(null);
+                          }
+                      } else {
+                           // For standard users, the initial fetch already provided the school data
+                           // We just need to extract it based on selectedSchool name
+                            if (responseData && responseData[selectedSchool]) {
+                             setAnalysisData(responseData[selectedSchool]);
+                           } else {
+                             console.warn("Unexpected API response structure for standard user analysis or no data for single school:", responseData);
+                            // Fallback: attempt to use the data fetched initially if available
+                            const initialData = schools.length > 1 ? schools.find(s => Object.keys(s)[0] === selectedSchool) : null; // Assuming schools state might hold initial data structure
+                            if(initialData && initialData[selectedSchool]) {
+                                setAnalysisData(initialData[selectedSchool]);
+                            } else {
+                                alert("No analysis data found for the selected school.");
+                                setAnalysisData(null);
+                            }
+
+                           }
+                      }
+                  })
+                  .catch((error) => {
+                    console.error("Error fetching analysis data for single school:", error);
+                    alert("Failed to fetch analysis data.");
+                    setAnalysisData(null);
+                  });
+           }
+       } else {
+           // Clear analysis data if school or chapter is not selected, or user is not loaded
+           setAnalysisData(null);
+       }
+
+  }, [selectedChapter, isSpecialUser, allChaptersData, selectedSchool, userId, schools]); // Added 'schools' to dependencies
 
   return (
     <div className="flex flex-col gap-6 mt-6 mb-10">
-      {/* Chapter + School + Button Inline */}
+      {/* Chapter + School */}
       <div className="flex gap-4 items-end flex-wrap">
         {/* Chapter Field/Dropdown */}
-        <div className="w-[590px]">
+        <div className="w-[650px]">
           <label className="block text-sm font-medium mb-1">Chapter</label>
            {isSpecialUser ? (
             // Render dropdown for special user
@@ -231,7 +282,7 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
                 setSelectedChapter(e.target.value);
                 // Schools and analysis data will be reset by the effects triggered by selectedChapter change
               }}
-              disabled={!userId} // Disable if user is not loaded yet
+              disabled={!userId}
             >
               <option value="">Select a chapter</option>
               {allChaptersData.map((item, index) => (
@@ -242,55 +293,45 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
             </select>
            ) : (
             // Render disabled input for other users
-             <input
-                className="p-2 border rounded-lg w-full bg-gray-100 text-gray-700"
+          <input
+            className="p-2 border rounded-lg w-full bg-gray-100 text-gray-700"
                 value={selectedChapter || "Loading chapter..."}
-                readOnly
-                disabled
-             />
+            readOnly
+            disabled
+          />
            )}
         </div>
 
         {/* School Dropdown */}
-        <div className="w-[590px]">
+        <div className="w-[650px]">
           <label className="block text-sm font-medium mb-1">School</label>
-           <select
+          <select
             className="p-2 border rounded-lg w-full"
             value={selectedSchool}
             onChange={(e) => {
                setSelectedSchool(e.target.value);
-               setAnalysisData(null); // Clear analysis data when school changes
+               // Analysis data fetching is now triggered by selectedSchool change useEffect
             }}
-             // Disable if no chapter is selected or no schools are available for the selected chapter
             disabled={!selectedChapter || schools.length === 0}
           >
             <option value="">Select a school</option>
-            {schools.map((school, index) => (
+            {/* Render 'All Schools' option first */}
+            {schools.includes('All Schools') && <option value="All Schools">All Schools</option>}
+            {/* Render actual schools, excluding 'All Schools' if it was manually added */}
+            {schools
+              .filter(school => school !== 'All Schools')
+              .map((school, index) => (
               <option key={school || index} value={school}>
                 {school}
               </option>
             ))}
           </select>
         </div>
-
-        {/* Get Analysis Button */}
-        <div className="h-[38px] flex items-center">
-          <button
-            className={`px-5 py-2 rounded-lg transition ${
-              selectedSchool && selectedChapter && userId
-                ? "bg-blue-500 text-white hover:bg-blue-600"
-                : "bg-gray-300 text-gray-500 cursor-not-allowed"
-            }`}
-            disabled={!selectedSchool || !selectedChapter || !userId} // Ensure user, chapter, and school are selected
-            onClick={handleGetAnalysis}
-          >
-            Get Analysis
-          </button>
-        </div>
       </div>
 
-      {/* Render QuestionMatrix if analysisData is available */}
-      {analysisData && <QuestionMatrix analysisData={analysisData} />}
+      {/* Render QuestionMatrix always, pass analysisData */}
+      {/* analysisData will be null initially, or populated after school selection */}
+       <QuestionMatrix analysisData={analysisData || []} />
 
       {/* ResponseBoxes section - keeping its original placement */}
        <div className="flex items-end gap-4 mb-2">

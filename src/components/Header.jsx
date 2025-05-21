@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-function Header() {
+function Header({ hideAuthLinks }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
 
@@ -21,28 +21,32 @@ function Header() {
 
       {/* Session Links */}
       <div className="flex justify-end px-6 mb-3">
-        {isLoggedIn ? (
-          <button
-            onClick={handleLogout}
-            className="text-red-600 font-semibold hover:underline"
-          >
-            Logout
-          </button>
-        ) : (
-          <div className="space-x-4">
-            <Link
-              to="/signin"
-              className="text-purple-700 font-medium hover:underline"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/signup"
-              className="text-purple-700 font-medium hover:underline"
-            >
-              Sign Up
-            </Link>
-          </div>
+        {!hideAuthLinks && (
+          <>
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="text-red-600 font-semibold hover:underline"
+              >
+                Logout
+              </button>
+            ) : (
+              <div className="space-x-4">
+                <Link
+                  to="/signin"
+                  className="text-purple-700 font-medium hover:underline"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/signup"
+                  className="text-purple-700 font-medium hover:underline"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+          </>
         )}
       </div>
 

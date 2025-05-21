@@ -1,20 +1,35 @@
 import React from "react";
-import Header from "../components/Header";
+import { Link } from "react-router-dom"; // Import Link for navigation
+import Header from "../components/Header"; // Assuming Header is in src/components
 
-const ChotaCopPage = () => {
+const Homepage = () => {
   return (
-    <div className="min-h-screen bg-[#fdf5eb] flex flex-col">
-      {/* Header at the top */}
+    <div className="flex flex-col min-h-screen bg-orange-50">
       <Header />
-
-      {/* Centered content */}
-      <div className="flex-grow flex items-center justify-center">
-        <h1 className="text-4xl md:text-5xl font-bold text-gray-800 mt-[-130px]">
-          ChotaCop
-        </h1>
+      <div className="flex flex-grow items-center justify-center p-4 mt-[-130px]">
+        <div className="flex flex-wrap justify-center items-center gap-10">
+          {/* Wrap the first logo in a Link to navigate to /questions */}
+          <Link to="/questions">
+            <img
+              src="http://yi.crivo.in/img/Yi-ChotaCop.png"
+              alt="Chota Cop Logo"
+              className="w-40 h-auto hover:opacity-80 transition-opacity cursor-pointer"
+            />
+          </Link>
+          <img
+            src="http://yi.crivo.in/img/Yi-Quiz%20Sample.png"
+            alt="Quiz Logo"
+            className="w-40 h-auto"
+          />
+          <img
+            src="http://yi.crivo.in/img/Yi-CZ%20Sample.png"
+            alt="Colouring Zone Logo"
+            className="w-40 h-auto"
+          />
+        </div>
       </div>
     </div>
   );
 };
 
-export default ChotaCopPage;
+export default Homepage;
