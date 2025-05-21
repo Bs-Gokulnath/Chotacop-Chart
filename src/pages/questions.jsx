@@ -122,7 +122,7 @@ const QuestionTogglePage = () => {
     // Parent zone (c5)
     data["c5"] = parentZoneAnswers[0] ? 1 : 0;
     try {
-      await axios.post("http://148.135.137.228:5000/upload", data, {
+      await axios.post("http://148.135.137.228:5001/upload", data, {
         headers: { "Content-Type": "application/json" },
       });
     } catch (err) {
@@ -190,7 +190,7 @@ const QuestionTogglePage = () => {
     formData.append("file", file);
     formData.append("email", studentInfo.email);
     try {
-      await axios.post("http://148.135.137.228:5000/send-pdf", formData, {
+      await axios.post("http://148.135.137.228:5001/send-pdf", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
     } catch (err) {
@@ -210,12 +210,12 @@ const QuestionTogglePage = () => {
     if (!email) return alert("Please enter an email.");
     setCheckingEmail(true);
     try {
-      const res = await axios.post("http://148.135.137.228:5000/check-mail", { email }, {
+      const res = await axios.post("http://148.135.137.228:5001/check-mail", { email }, {
         headers: { "Content-Type": "application/json" },
       });
       if (res.data.exists) {
         // Fetch full data for this email
-        const dataRes = await axios.post("http://148.135.137.228:5000/email-data", { email }, {
+        const dataRes = await axios.post("http://148.135.137.228:5001/email-data", { email }, {
           headers: { "Content-Type": "application/json" },
         });
         const info = dataRes.data.data && dataRes.data.data[0];
@@ -270,7 +270,7 @@ const QuestionTogglePage = () => {
 
   return (
     <div className="min-h-screen bg-[#fdf5eb]">
-      <Header hideAuthLinks={true} />
+      <Header hideAuthLinks={true} showHomeOnQuestions={true} />
       <div className="w-full max-w-8xl mx-auto p-6 md:p-10">
         {/* Student Info Form */}
         <div className="bg-[#fdf6bf] shadow-xl rounded-2xl p-6 mb-8 mt-[-40px]">

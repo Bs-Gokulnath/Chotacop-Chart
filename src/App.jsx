@@ -19,7 +19,7 @@ function App() {
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/analyze" element={<Analyze />} />
-          <Route path="/superadmin" element={<SuperAdmin />} />
+          {/* <Route path="/superadmin" element={<SuperAdmin />} /> */}
           <Route path="/questions" element={<QuestionTogglePage />} />
           
 
