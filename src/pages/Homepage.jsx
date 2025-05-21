@@ -17,7 +17,7 @@ const Homepage = () => {
             />
           </Link>
           <img
-            src="/public/assets/Yi-Quiz%20Sample.png"
+            src="/assets/Yi-QuizSample.png"
             alt="Quiz Logo"
             className="w-40 h-auto"
           />
