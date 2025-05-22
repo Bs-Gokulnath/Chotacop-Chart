@@ -12,6 +12,7 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
   const [analysisData, setAnalysisData] = useState(null);
   const [isSpecialUser, setIsSpecialUser] = useState(false);
   const [allChaptersData, setAllChaptersData] = useState([]);
+  const [standardUserData, setStandardUserData] = useState(null);
   const [chapterFetchedForStandardUser, setChapterFetchedForStandardUser] = useState(false);
 
   // Effect to get user ID and determine user type
@@ -31,6 +32,7 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
           setAnalysisData(null);
           setAllChaptersData([]);
           setSchools([]);
+          setStandardUserData(null);
           setChapterFetchedForStandardUser(false);
         } else {
           console.warn("User data found in local storage but no userId.");
@@ -53,11 +55,13 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
       setSelectedSchool("");
       setAnalysisData(null);
       setAllChaptersData([]);
+      setStandardUserData(null);
       setChapterFetchedForStandardUser(false);
       return;
     }
 
     if (!isSpecialUser && selectedChapter && chapterFetchedForStandardUser) {
+        // For standard user, initial data is already fetched and processed
         return;
     }
 
@@ -86,6 +90,9 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
           }
         } else {
            if (responseData && typeof responseData === 'object' && responseData.chapter && responseData.data && typeof responseData.data === 'object') {
+             // Store the full response data for standard user
+             setStandardUserData(responseData);
+
              const chapterName = responseData.chapter;
              const schoolData = responseData.data;
 
@@ -93,9 +100,12 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
              setChapterFetchedForStandardUser(true);
 
              const schoolNames = Object.keys(schoolData);
+              // Schools state should be an array of school names
              setSchools(schoolNames);
+
               if (schoolNames.length > 0) {
-                setSelectedSchool(schoolNames[0]); // Auto-select first school for standard user
+                //setSelectedSchool(schoolNames[0]); // Auto-select first school for standard user initially
+                setSelectedSchool('All Schools'); // Auto-select 'All Schools' by default
              } else {
                  setSelectedSchool("");
              }
@@ -104,6 +114,7 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
              alert("Error fetching chapter and school data for your user.");
              setSelectedChapter("");
              setSchools([]);
+             setStandardUserData(null);
            }
         }
       })
@@ -114,6 +125,7 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
         setSelectedChapter("");
         setSelectedSchool("");
         setAllChaptersData([]);
+        setStandardUserData(null);
       });
   }, [userId, isSpecialUser]);
 
@@ -133,13 +145,24 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
               const chapterData = allChaptersData.find(item => item.chapter === selectedChapter);
               if (chapterData?.data) {
                   const schoolsForChapter = Object.keys(chapterData.data);
-                  // Add 'All Schools' option at the beginning
-                  setSchools(['All Schools', ...schoolsForChapter]);
+                  // Add 'All Schools' option at the beginning if not already present
+                  if (!schools.includes('All Schools')) {
+                     setSchools(['All Schools', ...schoolsForChapter]);
+                  } else {
+                     // Update schools list ensuring 'All Schools' is still first
+                     const currentSchoolsWithoutAll = schools.filter(s => s !== 'All Schools');
+                     const newSchools = ['All Schools', ...schoolsForChapter];
+                     // Only update if the list of schools has actually changed (excluding 'All Schools')
+                     if (JSON.stringify(currentSchoolsWithoutAll) !== JSON.stringify(schoolsForChapter)) {
+                         setSchools(newSchools);
+                     }
+                  }
+
                   // If 'All Schools' was previously selected, keep it selected, otherwise clear or select first real school
                   if (selectedSchool === 'All Schools') {
                       // Keep 'All Schools' selected
                   } else if (selectedSchool && !schoolsForChapter.includes(selectedSchool)) {
-                      setSelectedSchool('');
+                      setSelectedSchool(''); // Clear selection if previously selected school is not in the new list
                   } else if (!selectedSchool && schoolsForChapter.length > 0) {
                        // Optionally auto-select the first school or 'All Schools'
                        setSelectedSchool('All Schools'); // Auto-select 'All Schools' by default
@@ -151,68 +174,110 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
           }
       } else {
           // For standard users, schools were already set in the initial fetch effect
-          // based on their assigned chapter. Add 'All Schools' to their limited list
-          const schoolsForChapter = Object.keys(schools);
-           if (schoolsForChapter.length > 0) {
-               setSchools(['All Schools', ...schoolsForChapter]);
+          // based on their assigned chapter. We need to ensure 'All Schools' is added.
+          // Ensure schools is treated as an array of strings
+          const currentSchools = Array.isArray(schools) ? schools : [];
+           // Check if 'All Schools' is already the first element or if there are schools to add
+           if (currentSchools[0] !== 'All Schools' && (currentSchools.length > 0 || (standardUserData?.data && Object.keys(standardUserData.data).length > 0))) {
+               setSchools(['All Schools', ...currentSchools]);
                // Auto-select 'All Schools' for standard users if they have schools
-               setSelectedSchool('All Schools');
-           } else {
-                setSchools([]);
-                setSelectedSchool('');
-           }
-      }
+               setSelectedSchool('All Schools'); // Auto-select 'All Schools' by default
+           } else if (currentSchools.length === 0 && standardUserData?.data && Object.keys(standardUserData.data).length > 0) {
+               // If schools were empty initially but standardUserData has school data, populate schools and add 'All Schools'
+               const schoolNames = Object.keys(standardUserData.data);
+                setSchools(['All Schools', ...schoolNames]); // Ensure schools state contains both 'All Schools' and the actual school names
+                 setSelectedSchool('All Schools'); // Auto-select 'All Schools'
+            } else if (currentSchools.length === 0) {
+                 // No schools found initially and no school data in standardUserData
+                 setSchools([]);
+                 setSelectedSchool('');
+            }
+       }
 
        // *** Trigger analysis data fetch when selectedSchool changes and is not empty ***
        if (selectedSchool && selectedChapter && userId) {
            if (selectedSchool === 'All Schools') {
                // Aggregate data for all schools in the selected chapter
                let aggregatedData = [];
-               const chapterData = isSpecialUser
-                ? allChaptersData.find(item => item.chapter === selectedChapter)
-                : { data: schools.reduce((acc, school) => { // Assuming schools state for standard user holds the single school's data structure
-                     if (school !== 'All Schools' && analysisData && analysisData.length > 0) { // Use existing analysisData for the single school as source
-                          acc[school] = analysisData; // This might need adjustment based on how standard user data is structured
-                     } else if (school !== 'All Schools') {
-                         // Fallback if analysisData isn't structured as expected, might need re-fetching
-                         console.warn("Analysis data not available for aggregation in standard user mode.");
-                         // Consider refetching the chapter data here to get the school's data
-                     }
-                     return acc;
-                   }, {}) };
 
-               if (chapterData?.data) {
-                   const schoolsToAggregate = Object.keys(chapterData.data).filter(school => school !== 'All Schools');
-                   if (schoolsToAggregate.length > 0) {
-                       const firstSchoolData = chapterData.data[schoolsToAggregate[0]];
-                       if (Array.isArray(firstSchoolData)) {
-                            // Initialize aggregated data structure based on questions from the first school
-                           aggregatedData = firstSchoolData.map(q => ({ q: q.q, yes: 0, no: 0 }));
+               if (isSpecialUser) {
+                    const chapterData = allChaptersData.find(item => item.chapter === selectedChapter);
+                    if (chapterData?.data) {
+                       const schoolsToAggregate = Object.keys(chapterData.data);
+                        if (schoolsToAggregate.length > 0) {
+                            // Assuming the structure is consistent across schools, take questions from the first school
+                            const firstSchoolData = chapterData.data[schoolsToAggregate[0]];
+                            if (Array.isArray(firstSchoolData)) {
+                                 // Initialize aggregated data structure based on questions from the first school
+                                aggregatedData = firstSchoolData.map(q => ({ q: q.q, yes: 0, no: 0 }));
 
-                           // Sum up yes/no for each question across all schools
-                           schoolsToAggregate.forEach(schoolName => {
-                               const schoolAnalysis = chapterData.data[schoolName];
-                                if (Array.isArray(schoolAnalysis)) {
-                                    schoolAnalysis.forEach((question, qIdx) => {
-                                        if (aggregatedData[qIdx]) {
-                                            aggregatedData[qIdx].yes += question.yes || 0;
-                                            aggregatedData[qIdx].no += question.no || 0;
-                                        }
-                                    });
-                                }
-                           });
-                            setAnalysisData(aggregatedData);
-                       } else {
-                            console.error("Unexpected data structure for school analysis data during aggregation.");
-                            setAnalysisData(null);
-                       }
-                   } else {
-                        // No schools to aggregate
+                                // Sum up yes/no for each question across all schools
+                                schoolsToAggregate.forEach(schoolName => {
+                                    const schoolAnalysis = chapterData.data[schoolName];
+                                     if (Array.isArray(schoolAnalysis)) {
+                                         schoolAnalysis.forEach((question, qIdx) => {
+                                             if (aggregatedData[qIdx]) {
+                                                 aggregatedData[qIdx].yes += question.yes || 0;
+                                                 aggregatedData[qIdx].no += question.no || 0;
+                                             }
+                                         });
+                                     }
+                                });
+                                 setAnalysisData(aggregatedData);
+                            } else {
+                                 console.error("Unexpected data structure for school analysis data during aggregation for special user.");
+                                 setAnalysisData(null);
+                            }
+                        } else {
+                             // No schools to aggregate
+                             setAnalysisData(null);
+                        }
+                    } else {
+                        // No chapter data found for aggregation
                         setAnalysisData(null);
-                   }
+                    }
                } else {
-                   // No chapter data found for aggregation
-                   setAnalysisData(null);
+                   // Standard user aggregation
+                   if (standardUserData?.data && standardUserData.chapter === selectedChapter) {
+                       const schoolData = standardUserData.data;
+                        const schoolsToAggregate = Object.keys(schoolData);
+                        if (schoolsToAggregate.length > 0) {
+                           // Assuming the structure is consistent across schools for the standard user's single chapter
+                           // The initial fetch for standard users gives data for their chapter and their schools within it.
+                           // If 'All Schools' is selected by a standard user, it means aggregate over the schools they have access to in their chapter.
+                           // Standard user data structure: { chapter: "ChapterName", data: { "School1": [analysis data], "School2": [analysis data] } }
+                           const firstSchoolName = schoolsToAggregate[0];
+                           const firstSchoolData = schoolData[firstSchoolName];
+
+                           if (Array.isArray(firstSchoolData)) {
+                                aggregatedData = firstSchoolData.map(q => ({ q: q.q, yes: 0, no: 0 }));
+
+                                schoolsToAggregate.forEach(schoolName => {
+                                    const schoolAnalysis = schoolData[schoolName];
+                                     if (Array.isArray(schoolAnalysis)) {
+                                         schoolAnalysis.forEach((question, qIdx) => {
+                                             if (aggregatedData[qIdx]) {
+                                                 aggregatedData[qIdx].yes += question.yes || 0;
+                                                 aggregatedData[qIdx].no += question.no || 0;
+                                             }
+                                         });
+                                     }
+                                });
+                                setAnalysisData(aggregatedData);
+                           } else {
+                                console.error("Unexpected data structure for school analysis data during aggregation for standard user.");
+                                setAnalysisData(null);
+                           }
+
+                        } else {
+                             // No schools to aggregate for standard user
+                             setAnalysisData(null);
+                        }
+                   } else {
+                       // Standard user data not available or chapter mismatch
+                       console.warn("Standard user data not available or chapter mismatch for aggregation.", { standardUserData, selectedChapter });
+                       setAnalysisData(null);
+                   }
                }
 
            } else {
@@ -224,7 +289,7 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
                      chapter: selectedChapter,
                   })
                   .then((response) => {
-                     const responseData = response.data?.data; // This structure might vary
+                     const responseData = response.data?.data; // This structure might vary based on the backend
 
                       if (isSpecialUser) {
                           const chapterData = allChaptersData.find(item => item.chapter === selectedChapter);
@@ -235,36 +300,29 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
                               setAnalysisData(null);
                           }
                       } else {
-                           // For standard users, the initial fetch already provided the school data
-                           // We just need to extract it based on selectedSchool name
-                            if (responseData && responseData[selectedSchool]) {
-                             setAnalysisData(responseData[selectedSchool]);
-                           } else {
-                             console.warn("Unexpected API response structure for standard user analysis or no data for single school:", responseData);
-                            // Fallback: attempt to use the data fetched initially if available
-                            const initialData = schools.length > 1 ? schools.find(s => Object.keys(s)[0] === selectedSchool) : null; // Assuming schools state might hold initial data structure
-                            if(initialData && initialData[selectedSchool]) {
-                                setAnalysisData(initialData[selectedSchool]);
+                           // For standard users, the initial fetch already provided the school data for their chapter.
+                           // We need to extract the data for the selected specific school from the stored standardUserData.
+                            if (standardUserData?.data?.[selectedSchool]) {
+                                setAnalysisData(standardUserData.data[selectedSchool]);
                             } else {
+                                console.warn("Analysis data not found for the selected school in standard user data.", { selectedSchool, standardUserData });
                                 alert("No analysis data found for the selected school.");
                                 setAnalysisData(null);
-                            }
-
                            }
                       }
                   })
                   .catch((error) => {
-                    console.error("Error fetching analysis data for single school:", error);
-                    alert("Failed to fetch analysis data.");
+                    console.error("Error fetching analysis data for specific school:", error);
+                    alert("Failed to fetch analysis data for the selected school.");
                     setAnalysisData(null);
                   });
            }
        } else {
-           // Clear analysis data if school or chapter is not selected, or user is not loaded
+            // Clear analysis data if school or chapter is not selected, or userId is missing
            setAnalysisData(null);
        }
 
-  }, [selectedChapter, isSpecialUser, allChaptersData, selectedSchool, userId, schools]); // Added 'schools' to dependencies
+  }, [selectedChapter, selectedSchool, userId, isSpecialUser, allChaptersData, standardUserData]); // Added standardUserData to dependencies
 
   return (
     <div className="flex flex-col gap-6 mt-6 mb-10">
