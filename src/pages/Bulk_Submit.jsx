@@ -86,14 +86,57 @@ const PreviewModal = ({ show, onClose }) => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white p-6 rounded-lg shadow-xl max-w-md">
                 <h3 className="text-lg font-bold mb-4">Expected Excel Format</h3>
-                <p className="mb-4">Your Excel file should have student names in the **first column** (Column A), starting from the **second row**. The first row is considered a header and will be skipped.</p>
+                <p className="mb-4">Your Excel file should have student names in the **first column** (Column A), starting from the **second row**. The first row can be used for a header like "Name".</p>
                 <div className="bg-gray-100 p-4 rounded mb-4">
                     <p className="font-semibold">Example:</p>
-                    <pre>Column A    | Column B
-------------|----------
-Student Name| ...
-Alice Smith | ...
-Bob Johnson | ...</pre>
+                    <table className="table-auto border-collapse">
+                        <thead>
+                            <tr>
+                                <th className="border px-4 py-2 text-left">A</th>
+                                <th className="border px-4 py-2 text-left">B</th>
+                                <th className="border px-4 py-2 text-left">C</th>
+                                <th className="border px-4 py-2 text-left">D</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td className="border px-4 py-2">Name</td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                            </tr>
+                            <tr>
+                                <td className="border px-4 py-2">Student Name1</td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                            </tr>
+                            <tr>
+                                <td className="border px-4 py-2">Student Name2</td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                            </tr>
+                            <tr>
+                                <td className="border px-4 py-2">Student Name3</td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                            </tr>
+                            <tr>
+                                <td className="border px-4 py-2">Student Name4</td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                            </tr>
+                            <tr>
+                                <td className="border px-4 py-2">Student Name5</td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <button
                     onClick={onClose}
@@ -559,7 +602,17 @@ const handleGenerateCertificates = async () => {
                 disabled={!isLoggedIn || studentNames.length > 0}
               />
             </div>
-            <ExcelUploaderPlaceholder disabled={!isLoggedIn} onNamesExtracted={handleNamesExtracted} />
+            <div className="flex-1 min-w-[180px] flex items-end gap-2">
+                <ExcelUploaderPlaceholder disabled={!isLoggedIn} onNamesExtracted={handleNamesExtracted} />
+                 <button
+                     onClick={() => setShowPreviewModal(true)}
+                     className="p-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition disabled:opacity-50 flex items-center justify-center"
+                      disabled={!isLoggedIn}
+                      title="Preview Excel Format"
+                  >
+                      👁️
+                  </button>
+             </div>
           </div>
         </div>
 
