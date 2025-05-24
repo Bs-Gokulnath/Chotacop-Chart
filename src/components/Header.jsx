@@ -96,8 +96,6 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
         {/* Yi Logo */}
         <a
           href="https://youngindians.net/"
-          target="_blank"
-          rel="noopener noreferrer"
           className="cursor-pointer"
           onClick={() => console.log("Yi Logo clicked")}
         >
@@ -111,8 +109,6 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
         {/* CII Logo */}
         <a
           href="https://www.cii.in/"
-          target="_blank"
-          rel="noopener noreferrer"
           className="cursor-pointer"
         >
           <img
@@ -127,8 +123,6 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
       <div className="hidden md:flex justify-center -mt-20">
         <a
           href="https://youngindians.net/road-safety/"
-          target="_blank"
-          rel="noopener noreferrer"
           className="cursor-pointer"
         >
           <img
@@ -143,8 +137,6 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
       <div className="md:hidden flex justify-center mt-4">
         <a
           href="https://youngindians.net/road-safety/"
-          target="_blank"
-          rel="noopener noreferrer"
           className="cursor-pointer"
         >
           <img
