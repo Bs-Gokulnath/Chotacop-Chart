@@ -8,6 +8,8 @@ import Analyze from './pages/Analyze'
 import SuperAdmin from './auth/superadmin'
 import Homepage from './pages/Homepage'
 import QuestionTogglePage from './pages/questions'
+import AdminHomepage from './pages/Admin_Home'
+import Bulk_Submit from './pages/Bulk_Submit'
 
 function App() {
 
@@ -19,10 +21,9 @@ function App() {
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/analyze" element={<Analyze />} />
-          {/* <Route path="/superadmin" element={<SuperAdmin />} /> */}
           <Route path="/questions" element={<QuestionTogglePage />} />
-          
-
+          <Route path="/admin" element={<AdminHomepage />} />
+          <Route path="/bulk" element={<Bulk_Submit />} />
       </Routes>
     </BrowserRouter>
   )

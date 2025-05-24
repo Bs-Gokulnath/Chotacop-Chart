@@ -3,19 +3,25 @@ import axios from "axios";
 import QuestionMatrix from "./QuestionMatrix";
 import ResponseBoxes from "./ResponseBoxes";
 
-const SPECIAL_USER_ID = "a0580799-f9f4-4731-87c4-b0906a68f7e2";
-const API_ENDPOINT = "http://148.135.137.228:5001/chapter-observation";
+// Updated API endpoint
+const API_ENDPOINT = "http://148.135.137.228:5001/chapter-data";
 
 const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, setSelectedSchool }) => {
   const [schools, setSchools] = useState([]);
   const [userId, setUserId] = useState("");
-  const [analysisData, setAnalysisData] = useState(null);
-  const [isSpecialUser, setIsSpecialUser] = useState(false);
-  const [allChaptersData, setAllChaptersData] = useState([]);
-  const [standardUserData, setStandardUserData] = useState(null);
-  const [chapterFetchedForStandardUser, setChapterFetchedForStandardUser] = useState(false);
+  // State for analysis data based on observation (for Card Data column)
+  const [observationAnalysisData, setObservationAnalysisData] = useState(null);
+  // State for analysis data based on question_stats (for Ride 1-7 columns)
+  const [questionStatsAnalysisData, setQuestionStatsAnalysisData] = useState(null);
 
-  // Effect to get user ID and determine user type
+  // State to track if the response structure is 'All_Chapter' type
+  const [isAllChapterStructure, setIsAllChapterStructure] = useState(false);
+  // State to store data for the 'All_Chapter' structure (entire response data)
+  const [allChaptersResponseData, setAllChaptersResponseData] = useState(null);
+  // State to store data for the standard user structure (entire response data)
+  const [standardUserResponseData, setStandardUserResponseData] = useState(null);
+
+  // Effect to get user ID
   useEffect(() => {
     const userData = localStorage.getItem("user");
     try {
@@ -25,15 +31,15 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
 
         if (user_id) {
           setUserId(user_id);
-          setIsSpecialUser(user_id === SPECIAL_USER_ID);
           // Reset states when user changes
           setSelectedChapter("");
           setSelectedSchool("");
-          setAnalysisData(null);
-          setAllChaptersData([]);
+          setObservationAnalysisData(null);
+          setQuestionStatsAnalysisData(null);
+          setAllChaptersResponseData(null);
           setSchools([]);
-          setStandardUserData(null);
-          setChapterFetchedForStandardUser(false);
+          setStandardUserResponseData(null);
+          setIsAllChapterStructure(false);
         } else {
           console.warn("User data found in local storage but no userId.");
           alert("User ID not found. Please sign in again.");
@@ -43,26 +49,27 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
       }
     } catch (error) {
       console.error("Failed to parse user data:", error);
-        alert("Error reading user data. Please sign in again.");
+      alert("Error reading user data. Please sign in again.");
     }
   }, []);
 
-  // Effect to fetch initial data (chapters and schools) based on user ID and type
+  // Effect to fetch initial data (chapters and schools) based on user ID and determine structure
   useEffect(() => {
     if (!userId) {
       setSchools([]);
       setSelectedChapter("");
       setSelectedSchool("");
-      setAnalysisData(null);
-      setAllChaptersData([]);
-      setStandardUserData(null);
-      setChapterFetchedForStandardUser(false);
+      setObservationAnalysisData(null);
+      setQuestionStatsAnalysisData(null);
+      setAllChaptersResponseData(null);
+      setStandardUserResponseData(null);
+      setIsAllChapterStructure(false);
       return;
     }
 
-    if (!isSpecialUser && selectedChapter && chapterFetchedForStandardUser) {
-        // For standard user, initial data is already fetched and processed
-        return;
+    // Prevent re-fetching if data is already loaded for the current user session
+    if (allChaptersResponseData !== null || standardUserResponseData !== null) {
+      return;
     }
 
     axios
@@ -72,50 +79,50 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
       .then((response) => {
         const responseData = response.data;
 
-        if (isSpecialUser) {
-          const chaptersData = responseData?.data;
-          if (Array.isArray(chaptersData)) {
-            setAllChaptersData(chaptersData);
-            const chapters = chaptersData.map((item) => item.chapter);
-            if (chapters.length > 0) {
-              setSelectedChapter(chapters[0]);
-            } else {
-               setSelectedChapter("");
-            }
+        if (
+          responseData?.chapter === "ALL_Chapter" &&
+          responseData?.chapters &&
+          typeof responseData.chapters === "object"
+        ) {
+          // Handle 'ALL_Chapter' structure
+          setIsAllChapterStructure(true);
+          setAllChaptersResponseData(responseData);
+
+          const chapters = Object.keys(responseData.chapters);
+          if (chapters.length > 0) {
+            setSelectedChapter(chapters[0]); // Auto-select the first chapter
           } else {
-            console.error("API response for special user is not in expected array format:", responseData);
-            alert("Error fetching chapter data for special user.");
-            setAllChaptersData([]);
             setSelectedChapter("");
           }
+        } else if (
+          responseData &&
+          typeof responseData === "object" &&
+          responseData.chapter &&
+          responseData.observation &&
+          typeof responseData.observation === "object"
+        ) {
+          // Handle standard user structure
+          setIsAllChapterStructure(false);
+          setStandardUserResponseData(responseData);
+
+          setSelectedChapter(responseData.chapter);
+
+          const schoolNames = Object.keys(responseData.observation);
+          setSchools(schoolNames);
+
+          if (schoolNames.length > 0) {
+            setSelectedSchool("All Schools");
+          } else {
+            setSelectedSchool("");
+          }
         } else {
-           if (responseData && typeof responseData === 'object' && responseData.chapter && responseData.data && typeof responseData.data === 'object') {
-             // Store the full response data for standard user
-             setStandardUserData(responseData);
-
-             const chapterName = responseData.chapter;
-             const schoolData = responseData.data;
-
-             setSelectedChapter(chapterName);
-             setChapterFetchedForStandardUser(true);
-
-             const schoolNames = Object.keys(schoolData);
-              // Schools state should be an array of school names
-             setSchools(schoolNames);
-
-              if (schoolNames.length > 0) {
-                //setSelectedSchool(schoolNames[0]); // Auto-select first school for standard user initially
-                setSelectedSchool('All Schools'); // Auto-select 'All Schools' by default
-             } else {
-                 setSelectedSchool("");
-             }
-           } else {
-             console.error("API response for standard user is not in expected format:", responseData);
-             alert("Error fetching chapter and school data for your user.");
-             setSelectedChapter("");
-             setSchools([]);
-             setStandardUserData(null);
-           }
+          console.error("API response is not in expected format for either structure:", responseData);
+          alert("Error fetching initial data.");
+          setSelectedChapter("");
+          setSchools([]);
+          setAllChaptersResponseData(null);
+          setStandardUserResponseData(null);
+          setIsAllChapterStructure(false);
         }
       })
       .catch((error) => {
@@ -124,205 +131,189 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
         setSchools([]);
         setSelectedChapter("");
         setSelectedSchool("");
-        setAllChaptersData([]);
-        setStandardUserData(null);
+        setAllChaptersResponseData(null);
+        setStandardUserResponseData(null);
+        setIsAllChapterStructure(false);
       });
-  }, [userId, isSpecialUser]);
+  }, [userId]);
 
-  // Effect to update schools when selected chapter changes (only for special user)
-  // and to trigger analysis data fetch when selected school changes
+  // Effect to update schools and analysis data when selected chapter or school changes
   useEffect(() => {
-      // Clear analysis data and schools if chapter is changed or becomes empty
-       if (!selectedChapter) {
-         setSchools([]);
-         setSelectedSchool('');
-         setAnalysisData(null);
-         return;
+    if (!selectedChapter) {
+      setSchools([]);
+      setSelectedSchool("");
+      setObservationAnalysisData(null);
+      setQuestionStatsAnalysisData(null);
+      return;
+    }
+
+    // Update schools based on selectedChapter (for All_Chapter structure)
+    if (isAllChapterStructure && allChaptersResponseData?.chapters) {
+      const chapterData = allChaptersResponseData.chapters[selectedChapter];
+      if (chapterData?.observation) {
+        const schoolsForChapter = Object.keys(chapterData.observation);
+        const newSchools = ["All Schools", ...schoolsForChapter];
+
+        setSchools(newSchools);
+        if (schoolsForChapter.length > 0 && !selectedSchool) {
+          setSelectedSchool("All Schools");
+        } else if (schoolsForChapter.length === 0) {
+          setSelectedSchool("");
+        }
+      } else {
+        setSchools([]);
+        setSelectedSchool("");
+      }
+    } else if (!isAllChapterStructure && standardUserResponseData?.observation) {
+      const currentSchools = Array.isArray(schools) ? schools : [];
+      if (
+        currentSchools[0] !== "All Schools" &&
+        (currentSchools.length > 0 ||
+          (standardUserResponseData?.observation &&
+            Object.keys(standardUserResponseData.observation).length > 0))
+      ) {
+        setSchools(["All Schools", ...currentSchools]);
+        if (!selectedSchool) {
+          setSelectedSchool("All Schools");
+        }
+      } else if (
+        currentSchools.length === 0 &&
+        standardUserResponseData?.observation &&
+        Object.keys(standardUserResponseData.observation).length > 0
+      ) {
+        const schoolNames = Object.keys(standardUserResponseData.observation);
+        setSchools(["All Schools", ...schoolNames]);
+        setSelectedSchool("All Schools");
+      } else if (currentSchools.length === 0) {
+        setSchools([]);
+        setSelectedSchool("");
+      }
+    }
+
+    // Process and set analysis data
+    if (selectedChapter && userId) {
+      let currentObservationAnalysis = null;
+      let currentQuestionStatsAnalysis = null;
+
+      if (isAllChapterStructure && allChaptersResponseData?.chapters) {
+        const chapterData = allChaptersResponseData.chapters[selectedChapter];
+
+        // Process Observation data (for Card Data column)
+        if (selectedSchool && chapterData?.observation) {
+          if (selectedSchool === "All Schools") {
+            let aggregatedObservationData = [];
+            const schoolsToAggregate = Object.keys(chapterData.observation);
+            if (schoolsToAggregate.length > 0) {
+              const firstSchoolName = schoolsToAggregate[0];
+              const firstSchoolObservation = chapterData.observation[firstSchoolName];
+              if (Array.isArray(firstSchoolObservation)) {
+                aggregatedObservationData = firstSchoolObservation.map((q) => ({
+                  q: q.q,
+                  yes: 0,
+                  no: 0,
+                }));
+                schoolsToAggregate.forEach((schoolName) => {
+                  const schoolObservation = chapterData.observation[schoolName];
+                  if (Array.isArray(schoolObservation)) {
+                    schoolObservation.forEach((question, qIdx) => {
+                      if (aggregatedObservationData[qIdx]) {
+                        aggregatedObservationData[qIdx].yes += question.yes || 0;
+                        aggregatedObservationData[qIdx].no += question.no || 0;
+                      }
+                    });
+                  }
+                });
+                currentObservationAnalysis = aggregatedObservationData;
+              }
+            }
+          } else {
+            currentObservationAnalysis = chapterData.observation[selectedSchool] || null;
+          }
+        }
+
+        // Process question_stats data (for Ride 1-7 columns)
+        if (chapterData?.question_stats) {
+          let rideStatsData = [];
+          const questionKeys = Object.keys(chapterData.question_stats); // e.g., ["q1", "q2", ...]
+          questionKeys.forEach((qKey, qIndex) => {
+            const questionStats = chapterData.question_stats[qKey];
+            if (questionStats?.rides) {
+              const ridesData = questionStats.rides;
+              let ridesArray = [];
+              for (let i = 0; i <= 6; i++) {
+                const rideKey = `ride_${i}`;
+                const rideData = ridesData[rideKey] || { ones: 0, zeros: 0, total: 0 };
+                ridesArray.push({
+                  ride: rideKey,
+                  yes: rideData.ones || 0,
+                  no: rideData.zeros || 0,
+                  total: rideData.total || 0,
+                });
+              }
+              rideStatsData.push({
+                qIndex,
+                rides: ridesArray,
+                qName: qKey,
+              });
+            } else {
+              let ridesArray = [];
+              for (let i = 0; i <= 6; i++) {
+                ridesArray.push({ ride: `ride_${i}`, yes: 0, no: 0, total: 0 });
+              }
+              rideStatsData.push({ qIndex, rides: ridesArray, qName: qKey });
+            }
+          });
+          currentQuestionStatsAnalysis = rideStatsData;
+        }
+      } else if (!isAllChapterStructure && standardUserResponseData?.observation) {
+        if (selectedSchool && standardUserResponseData.observation) {
+          if (selectedSchool === "All Schools") {
+            const schoolData = standardUserResponseData.observation;
+            const schoolsToAggregate = Object.keys(schoolData);
+            if (schoolsToAggregate.length > 0) {
+              const firstSchoolName = schoolsToAggregate[0];
+              const firstSchoolObservation = schoolData[firstSchoolName];
+              if (Array.isArray(firstSchoolObservation)) {
+                let aggregatedObservationData = firstSchoolObservation.map((q) => ({
+                  q: q.q,
+                  yes: 0,
+                  no: 0,
+                }));
+                schoolsToAggregate.forEach((schoolName) => {
+                  const schoolObservation = schoolData[schoolName];
+                  if (Array.isArray(schoolObservation)) {
+                    schoolObservation.forEach((question, qIdx) => {
+                      if (aggregatedObservationData[qIdx]) {
+                        aggregatedObservationData[qIdx].yes += question.yes || 0;
+                        aggregatedObservationData[qIdx].no += question.no || 0;
+                      }
+                    });
+                  }
+                });
+                currentObservationAnalysis = aggregatedObservationData;
+              }
+            }
+          } else {
+            currentObservationAnalysis = standardUserResponseData.observation[selectedSchool] || null;
+          }
+        }
+        currentQuestionStatsAnalysis = null;
       }
 
-      if (isSpecialUser) {
-          if (allChaptersData.length > 0) {
-              const chapterData = allChaptersData.find(item => item.chapter === selectedChapter);
-              if (chapterData?.data) {
-                  const schoolsForChapter = Object.keys(chapterData.data);
-                  // Add 'All Schools' option at the beginning if not already present
-                  if (!schools.includes('All Schools')) {
-                     setSchools(['All Schools', ...schoolsForChapter]);
-                  } else {
-                     // Update schools list ensuring 'All Schools' is still first
-                     const currentSchoolsWithoutAll = schools.filter(s => s !== 'All Schools');
-                     const newSchools = ['All Schools', ...schoolsForChapter];
-                     // Only update if the list of schools has actually changed (excluding 'All Schools')
-                     if (JSON.stringify(currentSchoolsWithoutAll) !== JSON.stringify(schoolsForChapter)) {
-                         setSchools(newSchools);
-                     }
-                  }
-
-                  // If 'All Schools' was previously selected, keep it selected, otherwise clear or select first real school
-                  if (selectedSchool === 'All Schools') {
-                      // Keep 'All Schools' selected
-                  } else if (selectedSchool && !schoolsForChapter.includes(selectedSchool)) {
-                      setSelectedSchool(''); // Clear selection if previously selected school is not in the new list
-                  } else if (!selectedSchool && schoolsForChapter.length > 0) {
-                       // Optionally auto-select the first school or 'All Schools'
-                       setSelectedSchool('All Schools'); // Auto-select 'All Schools' by default
-                  }
-              } else {
-                  setSchools([]);
-                  setSelectedSchool('');
-              }
-          }
-      } else {
-          // For standard users, schools were already set in the initial fetch effect
-          // based on their assigned chapter. We need to ensure 'All Schools' is added.
-          // Ensure schools is treated as an array of strings
-          const currentSchools = Array.isArray(schools) ? schools : [];
-           // Check if 'All Schools' is already the first element or if there are schools to add
-           if (currentSchools[0] !== 'All Schools' && (currentSchools.length > 0 || (standardUserData?.data && Object.keys(standardUserData.data).length > 0))) {
-               setSchools(['All Schools', ...currentSchools]);
-               // Auto-select 'All Schools' for standard users if they have schools
-               setSelectedSchool('All Schools'); // Auto-select 'All Schools' by default
-           } else if (currentSchools.length === 0 && standardUserData?.data && Object.keys(standardUserData.data).length > 0) {
-               // If schools were empty initially but standardUserData has school data, populate schools and add 'All Schools'
-               const schoolNames = Object.keys(standardUserData.data);
-                setSchools(['All Schools', ...schoolNames]); // Ensure schools state contains both 'All Schools' and the actual school names
-                 setSelectedSchool('All Schools'); // Auto-select 'All Schools'
-            } else if (currentSchools.length === 0) {
-                 // No schools found initially and no school data in standardUserData
-                 setSchools([]);
-                 setSelectedSchool('');
-            }
-       }
-
-       // *** Trigger analysis data fetch when selectedSchool changes and is not empty ***
-       if (selectedSchool && selectedChapter && userId) {
-           if (selectedSchool === 'All Schools') {
-               // Aggregate data for all schools in the selected chapter
-               let aggregatedData = [];
-
-               if (isSpecialUser) {
-                    const chapterData = allChaptersData.find(item => item.chapter === selectedChapter);
-                    if (chapterData?.data) {
-                       const schoolsToAggregate = Object.keys(chapterData.data);
-                        if (schoolsToAggregate.length > 0) {
-                            // Assuming the structure is consistent across schools, take questions from the first school
-                            const firstSchoolData = chapterData.data[schoolsToAggregate[0]];
-                            if (Array.isArray(firstSchoolData)) {
-                                 // Initialize aggregated data structure based on questions from the first school
-                                aggregatedData = firstSchoolData.map(q => ({ q: q.q, yes: 0, no: 0 }));
-
-                                // Sum up yes/no for each question across all schools
-                                schoolsToAggregate.forEach(schoolName => {
-                                    const schoolAnalysis = chapterData.data[schoolName];
-                                     if (Array.isArray(schoolAnalysis)) {
-                                         schoolAnalysis.forEach((question, qIdx) => {
-                                             if (aggregatedData[qIdx]) {
-                                                 aggregatedData[qIdx].yes += question.yes || 0;
-                                                 aggregatedData[qIdx].no += question.no || 0;
-                                             }
-                                         });
-                                     }
-                                });
-                                 setAnalysisData(aggregatedData);
-                            } else {
-                                 console.error("Unexpected data structure for school analysis data during aggregation for special user.");
-                                 setAnalysisData(null);
-                            }
-                        } else {
-                             // No schools to aggregate
-                             setAnalysisData(null);
-                        }
-                    } else {
-                        // No chapter data found for aggregation
-                        setAnalysisData(null);
-                    }
-               } else {
-                   // Standard user aggregation
-                   if (standardUserData?.data && standardUserData.chapter === selectedChapter) {
-                       const schoolData = standardUserData.data;
-                        const schoolsToAggregate = Object.keys(schoolData);
-                        if (schoolsToAggregate.length > 0) {
-                           // Assuming the structure is consistent across schools for the standard user's single chapter
-                           // The initial fetch for standard users gives data for their chapter and their schools within it.
-                           // If 'All Schools' is selected by a standard user, it means aggregate over the schools they have access to in their chapter.
-                           // Standard user data structure: { chapter: "ChapterName", data: { "School1": [analysis data], "School2": [analysis data] } }
-                           const firstSchoolName = schoolsToAggregate[0];
-                           const firstSchoolData = schoolData[firstSchoolName];
-
-                           if (Array.isArray(firstSchoolData)) {
-                                aggregatedData = firstSchoolData.map(q => ({ q: q.q, yes: 0, no: 0 }));
-
-                                schoolsToAggregate.forEach(schoolName => {
-                                    const schoolAnalysis = schoolData[schoolName];
-                                     if (Array.isArray(schoolAnalysis)) {
-                                         schoolAnalysis.forEach((question, qIdx) => {
-                                             if (aggregatedData[qIdx]) {
-                                                 aggregatedData[qIdx].yes += question.yes || 0;
-                                                 aggregatedData[qIdx].no += question.no || 0;
-                                             }
-                                         });
-                                     }
-                                });
-                                setAnalysisData(aggregatedData);
-                           } else {
-                                console.error("Unexpected data structure for school analysis data during aggregation for standard user.");
-                                setAnalysisData(null);
-                           }
-
-                        } else {
-                             // No schools to aggregate for standard user
-                             setAnalysisData(null);
-                        }
-                   } else {
-                       // Standard user data not available or chapter mismatch
-                       console.warn("Standard user data not available or chapter mismatch for aggregation.", { standardUserData, selectedChapter });
-                       setAnalysisData(null);
-                   }
-               }
-
-           } else {
-               // Fetch data for a specific school (existing logic)
-                axios
-                  .post(API_ENDPOINT, {
-                    user_id: userId,
-                    school_name: selectedSchool,
-                     chapter: selectedChapter,
-                  })
-                  .then((response) => {
-                     const responseData = response.data?.data; // This structure might vary based on the backend
-
-                      if (isSpecialUser) {
-                          const chapterData = allChaptersData.find(item => item.chapter === selectedChapter);
-                          if (chapterData?.data?.[selectedSchool]) {
-                              setAnalysisData(chapterData.data[selectedSchool]);
-                          } else {
-                              // alert("No analysis data found for the selected school in the special user's data.");
-                              setAnalysisData(null);
-                          }
-                      } else {
-                           // For standard users, the initial fetch already provided the school data for their chapter.
-                           // We need to extract the data for the selected specific school from the stored standardUserData.
-                            if (standardUserData?.data?.[selectedSchool]) {
-                                setAnalysisData(standardUserData.data[selectedSchool]);
-                            } else {
-                                console.warn("Analysis data not found for the selected school in standard user data.", { selectedSchool, standardUserData });
-                                alert("No analysis data found for the selected school.");
-                                setAnalysisData(null);
-                           }
-                      }
-                  })
-                  .catch((error) => {
-                    console.error("Error fetching analysis data for specific school:", error);
-                    alert("Failed to fetch analysis data for the selected school.");
-                    setAnalysisData(null);
-                  });
-           }
-       } else {
-            // Clear analysis data if school or chapter is not selected, or userId is missing
-           setAnalysisData(null);
-       }
-
-  }, [selectedChapter, selectedSchool, userId, isSpecialUser, allChaptersData, standardUserData]); // Added standardUserData to dependencies
+      setObservationAnalysisData(currentObservationAnalysis);
+      setQuestionStatsAnalysisData(currentQuestionStatsAnalysis);
+    } else {
+      setObservationAnalysisData(null);
+      setQuestionStatsAnalysisData(null);
+    }
+  }, [
+    selectedChapter,
+    selectedSchool,
+    userId,
+    isAllChapterStructure,
+    allChaptersResponseData,
+    standardUserResponseData,
+  ]);
 
   return (
     <div className="flex flex-col gap-6 mt-6 mb-10">
@@ -331,33 +322,36 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
         {/* Chapter Field/Dropdown */}
         <div className="w-[650px]">
           <label className="block text-sm font-medium mb-1">Chapter</label>
-           {isSpecialUser ? (
-            // Render dropdown for special user
+          {isAllChapterStructure ? (
             <select
               className="p-2 border rounded-lg w-full"
               value={selectedChapter}
               onChange={(e) => {
                 setSelectedChapter(e.target.value);
-                // Schools and analysis data will be reset by the effects triggered by selectedChapter change
+                setSelectedSchool("");
               }}
-              disabled={!userId}
+              disabled={
+                !userId ||
+                !allChaptersResponseData?.chapters ||
+                Object.keys(allChaptersResponseData.chapters).length === 0
+              }
             >
               <option value="">Select a chapter</option>
-              {allChaptersData.map((item, index) => (
-                <option key={item.chapter || index} value={item.chapter}>
-                  {item.chapter}
-                </option>
-              ))}
+              {allChaptersResponseData?.chapters &&
+                Object.keys(allChaptersResponseData.chapters).map((chapterName, index) => (
+                  <option key={chapterName || index} value={chapterName}>
+                    {chapterName}
+                  </option>
+                ))}
             </select>
-           ) : (
-            // Render disabled input for other users
-          <input
-            className="p-2 border rounded-lg w-full bg-gray-100 text-gray-700"
-                value={selectedChapter || "Loading chapter..."}
-            readOnly
-            disabled
-          />
-           )}
+          ) : (
+            <input
+              className="p-2 border rounded-lg w-full bg-gray-100 text-gray-700"
+              value={selectedChapter || "Loading chapter..."}
+              readOnly
+              disabled
+            />
+          )}
         </div>
 
         {/* School Dropdown */}
@@ -366,43 +360,37 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
           <select
             className="p-2 border rounded-lg w-full"
             value={selectedSchool}
-            onChange={(e) => {
-               setSelectedSchool(e.target.value);
-               // Analysis data fetching is now triggered by selectedSchool change useEffect
-            }}
+            onChange={(e) => setSelectedSchool(e.target.value)}
             disabled={!selectedChapter || schools.length === 0}
           >
             <option value="">Select a school</option>
-            {/* Render 'All Schools' option first */}
-            {schools.includes('All Schools') && <option value="All Schools">All Schools</option>}
-            {/* Render actual schools, excluding 'All Schools' if it was manually added */}
+            {schools.includes("All Schools") && <option value="All Schools">All Schools</option>}
             {schools
-              .filter(school => school !== 'All Schools')
+              .filter((school) => school !== "All Schools")
               .map((school, index) => (
-              <option key={school || index} value={school}>
-                {school}
-              </option>
-            ))}
+                <option key={school || index} value={school}>
+                  {school}
+                </option>
+              ))}
           </select>
         </div>
       </div>
 
-      {/* Render QuestionMatrix always, pass analysisData */}
-      {/* analysisData will be null initially, or populated after school selection */}
-       <QuestionMatrix analysisData={analysisData || []} />
+      {/* Render QuestionMatrix with processed data */}
+      <QuestionMatrix
+        observationAnalysisData={observationAnalysisData}
+        questionStatsAnalysisData={questionStatsAnalysisData}
+      />
 
-      {/* ResponseBoxes section - keeping its original placement */}
-       <div className="flex items-end gap-4 mb-2">
-            <div className="flex flex-col w-[220px]">
-              <div className="rounded-lg w-full font-medium">
-                
-              </div>
-            </div>
-             <div className="flex-1">
-              {/* You might need to pass actual response count data here if available in analysisData */}
-              <ResponseBoxes count={8} /> {/* Placeholder count */}
-            </div>
-          </div>
+      {/* ResponseBoxes section */}
+      <div className="flex items-end gap-4 mb-2">
+        <div className="flex flex-col w-[220px]">
+          <div className="rounded-lg w-full font-medium"></div>
+        </div>
+        <div className="flex-1">
+          <ResponseBoxes count={8} />
+        </div>
+      </div>
     </div>
   );
 };
