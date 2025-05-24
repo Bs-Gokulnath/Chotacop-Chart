@@ -40,8 +40,12 @@ const Bulk_Submit = () => {
     chapter: "",
     school: "",
   });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
+    const user = localStorage.getItem("user");
+    setIsLoggedIn(!!user);
+
     const count = parseInt(submissionsCount, 10);
     if (isNaN(count) || count <= 0) {
       setAllSubmissionsData([createEmptySubmission()]);
@@ -64,6 +68,10 @@ const Bulk_Submit = () => {
       alert('Please fill in chapter and school information before answering.');
       return;
     }
+    if (!isLoggedIn) {
+        alert('Please sign in to fill data.');
+        return;
+    }
     if (currentSubmission.isSubmitted) return;
 
     setAllSubmissionsData(prevData => {
@@ -83,6 +91,10 @@ const Bulk_Submit = () => {
       alert('Please fill in chapter and school information before answering.');
       return;
     }
+    if (!isLoggedIn) {
+        alert('Please sign in to fill data.');
+        return;
+    }
     if (currentSubmission.isSubmitted) return;
 
     setAllSubmissionsData(prevData => {
@@ -100,6 +112,10 @@ const Bulk_Submit = () => {
     if (!isStudentInfoComplete) {
       alert('Please fill in chapter and school information before answering.');
       return;
+    }
+    if (!isLoggedIn) {
+        alert('Please sign in to fill data.');
+        return;
     }
     if (currentSubmission.isSubmitted) return;
 
@@ -119,6 +135,10 @@ const Bulk_Submit = () => {
       alert('Please fill in chapter and school information before answering.');
       return;
     }
+    if (!isLoggedIn) {
+        alert('Please sign in to fill data.');
+        return;
+    }
     if (currentSubmission.isSubmitted) return;
 
     setAllSubmissionsData(prevData => {
@@ -136,6 +156,10 @@ const Bulk_Submit = () => {
     if (!isStudentInfoComplete) {
       alert('Please fill in chapter and school information before submitting.');
       return;
+    }
+    if (!isLoggedIn) {
+        alert('Please sign in to submit.');
+        return;
     }
 
     if (allSubmissionsData.some(sub => sub.isSubmitted)) {
@@ -194,6 +218,10 @@ const Bulk_Submit = () => {
       alert('Please fill in chapter and school information before moving to the next.');
       return;
     }
+    if (!isLoggedIn) {
+        alert('Please sign in to proceed.');
+        return;
+    }
     if (currentSubmissionIndex < submissionsCount - 1) {
       setCurrentSubmissionIndex(prevIndex => prevIndex + 1);
     }
@@ -225,12 +253,15 @@ const Bulk_Submit = () => {
                 min="1"
                 value={submissionsCount}
                 onChange={handleSubmissionsCountChange}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2"
+                className={`w-full border border-gray-300 rounded-lg px-4 py-2 ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={!isLoggedIn}
               />
             </div>
             <div className="flex-1 min-w-[180px]">
               <label className="block text-sm font-medium mb-1">Chapter</label>
-              <select name="chapter" value={studentInfo.chapter} onChange={handleStudentInfoChange} className="w-full border border-gray-300 rounded-lg px-4 py-2">
+              <select name="chapter" value={studentInfo.chapter} onChange={handleStudentInfoChange} className={`w-full border border-gray-300 rounded-lg px-4 py-2 ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={!isLoggedIn}
+              >
                 <option value="">Select Chapter</option>
                 <option value="Agra">Agra</option>
                 <option value="Ahmedabad">Ahmedabad</option>
@@ -299,7 +330,9 @@ const Bulk_Submit = () => {
             </div>
             <div className="flex-1 min-w-[180px]">
               <label className="block text-sm font-medium mb-1">School</label>
-              <input type="text" name="school" placeholder="School" value={studentInfo.school} onChange={handleStudentInfoChange} className="w-full border border-gray-300 rounded-lg px-4 py-2" />
+              <input type="text" name="school" placeholder="School" value={studentInfo.school} onChange={handleStudentInfoChange} className={`w-full border border-gray-300 rounded-lg px-4 py-2 ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                disabled={!isLoggedIn}
+              />
             </div>
           </div>
         </div>
@@ -320,8 +353,8 @@ const Bulk_Submit = () => {
                         onClick={() => handleParentToggle(rideIdx)}
                         className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
                           isAnswered ? "bg-green-500" : "bg-red-500"
-                        } ${!isStudentInfoComplete || currentSubmission.isSubmitted ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={!isStudentInfoComplete || currentSubmission.isSubmitted}
+                        } ${!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn}
                       >
                         <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
                         <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
@@ -346,8 +379,8 @@ const Bulk_Submit = () => {
                         onClick={() => handleParentToggle(rideIdx)}
                         className={`relative w-12 h-5 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
                           isAnswered ? "bg-green-500" : "bg-red-500"
-                        } ${!isStudentInfoComplete || currentSubmission.isSubmitted ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={!isStudentInfoComplete || currentSubmission.isSubmitted}
+                        } ${!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn}
                       >
                         <div
                           className={`absolute w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
@@ -391,8 +424,8 @@ const Bulk_Submit = () => {
                           onClick={() => handleToggle(rideIdx, qIdx)}
                           className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
                             isAnswered ? "bg-green-500" : "bg-red-500"
-                          } ${!isStudentInfoComplete || currentSubmission.isSubmitted ? 'opacity-50 cursor-not-allowed' : ''}`}
-                          disabled={!isStudentInfoComplete || currentSubmission.isSubmitted}
+                          } ${!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                          disabled={!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn}
                         >
                           <div
                             className={`absolute w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
@@ -431,8 +464,8 @@ const Bulk_Submit = () => {
                               onClick={() => handleToggle(rideIdx, qIdx)}
                               className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 mx-auto flex items-center px-1 ${
                                 isAnswered ? "bg-green-500" : "bg-red-500"
-                              } ${!isStudentInfoComplete || currentSubmission.isSubmitted ? 'opacity-50 cursor-not-allowed' : ''}`}
-                              disabled={!isStudentInfoComplete || currentSubmission.isSubmitted}
+                              } ${!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              disabled={!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn}
                             >
                               <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
                               <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
@@ -469,7 +502,7 @@ const Bulk_Submit = () => {
               handleParentZoneToggle={handleParentZoneToggle}
             />
 
-            <ImageUploader />
+            <ImageUploader disabled={!isLoggedIn} />
           </div>
         )}
 
@@ -478,6 +511,7 @@ const Bulk_Submit = () => {
             <button
               onClick={handlePreviousSubmission}
               className="px-6 py-3 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-colors duration-300"
+              disabled={!isLoggedIn}
             >
               Previous
             </button>
@@ -486,9 +520,9 @@ const Bulk_Submit = () => {
           {!showSubmitAllButton && (
             <button
               onClick={handleNextSubmission}
-              disabled={!isStudentInfoComplete || currentSubmission?.isSubmitted}
+              disabled={!isStudentInfoComplete || currentSubmission?.isSubmitted || !isLoggedIn}
               className={`px-6 py-3 rounded-xl font-bold text-white transition-colors duration-300 ${
-                isStudentInfoComplete && !currentSubmission?.isSubmitted
+                isStudentInfoComplete && !currentSubmission?.isSubmitted && isLoggedIn
                   ? "bg-blue-600 hover:bg-blue-700"
                   : "bg-gray-400 cursor-not-allowed"
               }`}
@@ -500,9 +534,9 @@ const Bulk_Submit = () => {
           {showSubmitAllButton && (
             <button
               onClick={handleSubmitAll}
-              disabled={isSubmitAllButtonDisabled}
+              disabled={isSubmitAllButtonDisabled || !isLoggedIn}
               className={`px-6 py-3 rounded-xl font-bold text-white transition-colors duration-300 ${
-                !isSubmitAllButtonDisabled ? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"
+                !isSubmitAllButtonDisabled && isLoggedIn ? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"
               }`}
             >
               Submit All Submissions

@@ -49,7 +49,7 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
       }
     } catch (error) {
       console.error("Failed to parse user data:", error);
-      alert("Error reading user data. Please sign in again.");
+        alert("Error reading user data. Please sign in again.");
     }
   }, []);
 
@@ -345,12 +345,12 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
                 ))}
             </select>
           ) : (
-            <input
-              className="p-2 border rounded-lg w-full bg-gray-100 text-gray-700"
+          <input
+            className="p-2 border rounded-lg w-full bg-gray-100 text-gray-700"
               value={selectedChapter || "Loading chapter..."}
-              readOnly
-              disabled
-            />
+            readOnly
+            disabled
+          />
           )}
         </div>
 
@@ -369,9 +369,9 @@ const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, s
               .filter((school) => school !== "All Schools")
               .map((school, index) => (
                 <option key={school || index} value={school}>
-                  {school}
-                </option>
-              ))}
+                {school}
+              </option>
+            ))}
           </select>
         </div>
       </div>

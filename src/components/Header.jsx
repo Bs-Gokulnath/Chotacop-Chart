@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
-function Header({ hideAuthLinks, showHomeLink, isHomepage, alwaysShowHome, showHomeOnQuestions }) {
+function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }) {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation(); // Get the current location
+  const currentPath = location.pathname;
 
   useEffect(() => {
     const user = localStorage.getItem("user");
@@ -26,20 +28,6 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, alwaysShowHome, showH
     );
   } else if (!hideAuthLinks) {
     if (isLoggedIn) {
-      if (showHomeLink && !isHomepage) {
-        sessionLinks.push(
-          <Link key="home" to="/" className="text-blue-600 font-semibold hover:underline">
-            Home
-          </Link>
-        );
-      }
-      if (isHomepage) {
-        sessionLinks.push(
-          <Link key="dashboard" to="/analyze" className="text-blue-600 font-semibold hover:underline">
-            Dashboard
-          </Link>
-        );
-      }
       sessionLinks.push(
         <button
           key="logout"
@@ -49,6 +37,26 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, alwaysShowHome, showH
           Logout
         </button>
       );
+
+      if (currentPath === '/admin') {
+        sessionLinks.unshift(
+          <Link key="home-on-admin" to="/" className="text-blue-600 font-semibold hover:underline">
+            Home
+          </Link>
+        );
+      } else if (isHomepage) {
+        sessionLinks.unshift(
+          <Link key="dashboard-on-home" to="/admin" className="text-blue-600 font-semibold hover:underline">
+            Dashboard
+          </Link>
+        );
+      } else if (showHomeLink) {
+        sessionLinks.unshift(
+          <Link key="home-general" to="/" className="text-blue-600 font-semibold hover:underline">
+            Home
+          </Link>
+        );
+      }
     } else {
       if (!isHomepage) {
         sessionLinks.push(
@@ -57,19 +65,20 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, alwaysShowHome, showH
           </Link>
         );
       }
+      // Add Admin Dashboard link when not logged in and not on signin/signup pages
+      if (currentPath !== '/signin' && currentPath !== '/signup') {
+          sessionLinks.push(
+              <Link key="admin-dashboard-unauth" to="/admin" className="text-blue-600 font-semibold hover:underline">
+                  Admin
+              </Link>
+          );
+      }
       sessionLinks.push(
         <Link key="signin" to="/signin" className="text-purple-700 font-medium hover:underline">
           Sign In
         </Link>,
         <Link key="signup" to="/signup" className="text-purple-700 font-medium hover:underline">
           Sign Up
-        </Link>
-      );
-    }
-    if (alwaysShowHome && !sessionLinks.some((link) => link.key === "home")) {
-      sessionLinks.unshift(
-        <Link key="home-always" to="/" className="text-blue-600 font-semibold hover:underline">
-          Home
         </Link>
       );
     }
