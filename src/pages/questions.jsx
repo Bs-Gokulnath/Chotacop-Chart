@@ -109,18 +109,25 @@ const QuestionTogglePage = () => {
       school: studentInfo.school,
       class_: studentInfo.class,
     };
-    // Main questions (q1 to q12)
+
+    // Filter ridesAnswers and parentRideAnswers based on rideActive state
+    const activeRidesAnswers = ridesAnswers.filter((_, rideIdx) => rideActive[rideIdx]);
+    const activeParentRideAnswers = parentRideAnswers.filter((_, rideIdx) => rideActive[rideIdx]);
+
+    // Main questions (q1 to q12) - process only active rides
     for (let q = 0; q < questions.length; q++) {
-      data[`q${q + 1}`] = ridesAnswers.map((ride) => ride[q] ? 1 : 0);
+      data[`q${q + 1}`] = activeRidesAnswers.map((ride) => ride[q] ? 1 : 0);
     }
-    // Parent toggles (q13)
-    data["q13"] = parentRideAnswers.map((v) => v ? 1 : 0);
-    // Experience zone (c1-c4)
+
+    // Parent toggles (q13) - process only active rides
+    data["q13"] = activeParentRideAnswers.map((v) => v ? 1 : 0);
+
+    // Experience zone (c1-c4) and Parent zone (c5) - these are not ride-specific, send them as is
     for (let i = 0; i < experienceAnswers.length; i++) {
       data[`c${i + 1}`] = experienceAnswers[i] ? 1 : 0;
     }
-    // Parent zone (c5)
     data["c5"] = parentZoneAnswers[0] ? 1 : 0;
+
     try {
       await axios.post("http://148.135.137.228:5001/upload", data, {
         headers: { "Content-Type": "application/json" },

@@ -29,13 +29,13 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
   } else if (!hideAuthLinks) {
     if (isLoggedIn) {
       sessionLinks.push(
-        <button
+          <button
           key="logout"
-          onClick={handleLogout}
-          className="text-red-600 font-semibold hover:underline"
-        >
-          Logout
-        </button>
+            onClick={handleLogout}
+            className="text-red-600 font-semibold hover:underline"
+          >
+            Logout
+          </button>
       );
 
       if (currentPath === '/admin') {
@@ -75,11 +75,11 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
       }
       sessionLinks.push(
         <Link key="signin" to="/signin" className="text-purple-700 font-medium hover:underline">
-          Sign In
+              Sign In
         </Link>,
         <Link key="signup" to="/signup" className="text-purple-700 font-medium hover:underline">
-          Sign Up
-        </Link>
+              Sign Up
+            </Link>
       );
     }
   }

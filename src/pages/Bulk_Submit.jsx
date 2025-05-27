@@ -230,7 +230,7 @@ const Bulk_Submit = () => {
     }
     if (!isLoggedIn) {
         alert('Please sign in to fill data.');
-        return;
+      return;
     }
     if (currentSubmission.isSubmitted) return;
 
@@ -253,7 +253,7 @@ const Bulk_Submit = () => {
     }
     if (!isLoggedIn) {
         alert('Please sign in to fill data.');
-        return;
+      return;
     }
     if (currentSubmission.isSubmitted) return;
 
@@ -261,7 +261,7 @@ const Bulk_Submit = () => {
       const newData = [...prevData];
       const updatedSubmission = { ...newData[currentSubmissionIndex] };
       const updatedParentAnswers = [...updatedSubmission.parentRideAnswers];
-      updatedParentAnswers[rideIdx] = !updatedParentAnswers[rideIdx];
+    updatedParentAnswers[rideIdx] = !updatedParentAnswers[rideIdx];
       updatedSubmission.parentRideAnswers = updatedParentAnswers;
       newData[currentSubmissionIndex] = updatedSubmission;
       return newData;
@@ -316,7 +316,7 @@ const Bulk_Submit = () => {
     const { school, class: studentClass, chapter } = studentInfo;
     const tempDiv = document.createElement("div");
     tempDiv.className =
-        "relative w-[1123px] h-[794px] bg-white shadow-lg border rounded-lg overflow-hidden";
+      "relative w-[1123px] h-[794px] bg-white shadow-lg border rounded-lg overflow-hidden";
     tempDiv.style.width = "1123px";
     tempDiv.style.height = "794px";
     // Load Shrikhand and Canvas Sans fonts
@@ -357,14 +357,14 @@ const Bulk_Submit = () => {
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     return html2canvas(tempDiv, { scale: 3 }).then((canvas) => {
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF("landscape", "px", [1123, 794]);
-        pdf.addImage(imgData, "PNG", 0, 0, 1123, 794);
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF("landscape", "px", [1123, 794]);
+      pdf.addImage(imgData, "PNG", 0, 0, 1123, 794);
         const pdfBlob = pdf.output("blob");
-        document.body.removeChild(tempDiv);
+      document.body.removeChild(tempDiv);
         return pdfBlob;
     });
-};
+  };
 
 const handleGenerateCertificates = async () => {
     if (!isStudentInfoComplete) {
@@ -512,71 +512,71 @@ const handleGenerateCertificates = async () => {
               <select name="chapter" value={studentInfo.chapter} onChange={handleStudentInfoChange} className={`w-full border border-gray-300 rounded-lg px-4 py-2 ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
                 disabled={!isLoggedIn}
               >
-                <option value="">Select Chapter</option>
-                <option value="Agra">Agra</option>
-                <option value="Ahmedabad">Ahmedabad</option>
-                <option value="Ajmer">Ajmer</option>
-                <option value="Amaravati">Amaravati</option>
-                <option value="Balasore">Balasore</option>
-                <option value="Bengaluru">Bengaluru</option>
-                <option value="Bhopal">Bhopal</option>
-                <option value="Bhavnagar">Bhavnagar</option>
-                <option value="Bhubaneswar">Bhubaneswar</option>
-                <option value="Chandigarh">Chandigarh</option>
-                <option value="Chennai">Chennai</option>
-                <option value="Chhatrapati Sambhajinagar">Chhatrapati Sambhajinagar</option>
-                <option value="Coimbatore">Coimbatore</option>
-                <option value="Dehradun">Dehradun</option>
-                <option value="Delhi">Delhi</option>
-                <option value="Dindigul">Dindigul</option>
-                <option value="Durg">Durg</option>
-                <option value="Erode">Erode</option>
-                <option value="Goa">Goa</option>
-                <option value="Gurugram">Gurugram</option>
-                <option value="Guwahati">Guwahati</option>
-                <option value="Gwalior">Gwalior</option>
-                <option value="Hosur">Hosur</option>
-                <option value="Hubballi">Hubballi</option>
-                <option value="Hyderabad">Hyderabad</option>
-                <option value="Indore">Indore</option>
-                <option value="Jaipur">Jaipur</option>
-                <option value="Jabalpur">Jabalpur</option>
-                <option value="Jamshedpur">Jamshedpur</option>
-                <option value="Kanpur">Kanpur</option>
-                <option value="Karur">Karur</option>
-                <option value="Kochi">Kochi</option>
-                <option value="Kolkata">Kolkata</option>
-                <option value="Kota">Kota</option>
-                <option value="Kozhikode">Kozhikode</option>
-                <option value="Lucknow">Lucknow</option>
-                <option value="Madurai">Madurai</option>
-                <option value="Mangaluru">Mangaluru</option>
-                <option value="Mumbai">Mumbai</option>
-                <option value="Mysuru">Mysuru</option>
-                <option value="Nagaland">Nagaland</option>
-                <option value="Nagpur">Nagpur</option>
-                <option value="Nashik">Nashik</option>
-                <option value="Noida">Noida</option>
-                <option value="Puducherry">Puducherry</option>
-                <option value="Pune">Pune</option>
-                <option value="Raipur">Raipur</option>
-                <option value="Rajkot">Rajkot</option>
-                <option value="Ranchi">Ranchi</option>
-                <option value="Salem">Salem</option>
-                <option value="Sikkim">Sikkim</option>
-                <option value="Siliguri">Siliguri</option>
-                <option value="Sivakasi">Sivakasi</option>
-                <option value="Surat">Surat</option>
-                <option value="Thoothukudi">Thoothukudi</option>
-                <option value="Tirupur">Tirupur</option>
-                <option value="Tirupur">Tirupati</option>
-                <option value="Trichy">Trichy</option>
-                <option value="Trivandrum">Trivandrum</option>
-                <option value="Vadodara">Vadodara</option>
-                <option value="Varanasi">Varanasi</option>
-                <option value="Vellore">Vellore</option>
-                <option value="Vizag">Vizag</option>
-              </select>
+              <option value="">Select Chapter</option>
+              <option value="Agra">Agra</option>
+              <option value="Ahmedabad">Ahmedabad</option>
+              <option value="Ajmer">Ajmer</option>
+              <option value="Amaravati">Amaravati</option>
+              <option value="Balasore">Balasore</option>
+              <option value="Bengaluru">Bengaluru</option>
+              <option value="Bhopal">Bhopal</option>
+              <option value="Bhavnagar">Bhavnagar</option>
+              <option value="Bhubaneswar">Bhubaneswar</option>
+              <option value="Chandigarh">Chandigarh</option>
+              <option value="Chennai">Chennai</option>
+              <option value="Chhatrapati Sambhajinagar">Chhatrapati Sambhajinagar</option>
+              <option value="Coimbatore">Coimbatore</option>
+              <option value="Dehradun">Dehradun</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Dindigul">Dindigul</option>
+              <option value="Durg">Durg</option>
+              <option value="Erode">Erode</option>
+              <option value="Goa">Goa</option>
+              <option value="Gurugram">Gurugram</option>
+              <option value="Guwahati">Guwahati</option>
+              <option value="Gwalior">Gwalior</option>
+              <option value="Hosur">Hosur</option>
+              <option value="Hubballi">Hubballi</option>
+              <option value="Hyderabad">Hyderabad</option>
+              <option value="Indore">Indore</option>
+              <option value="Jaipur">Jaipur</option>
+              <option value="Jabalpur">Jabalpur</option>
+              <option value="Jamshedpur">Jamshedpur</option>
+              <option value="Kanpur">Kanpur</option>
+              <option value="Karur">Karur</option>
+              <option value="Kochi">Kochi</option>
+              <option value="Kolkata">Kolkata</option>
+              <option value="Kota">Kota</option>
+              <option value="Kozhikode">Kozhikode</option>
+              <option value="Lucknow">Lucknow</option>
+              <option value="Madurai">Madurai</option>
+              <option value="Mangaluru">Mangaluru</option>
+              <option value="Mumbai">Mumbai</option>
+              <option value="Mysuru">Mysuru</option>
+              <option value="Nagaland">Nagaland</option>
+              <option value="Nagpur">Nagpur</option>
+              <option value="Nashik">Nashik</option>
+              <option value="Noida">Noida</option>
+              <option value="Puducherry">Puducherry</option>
+              <option value="Pune">Pune</option>
+              <option value="Raipur">Raipur</option>
+              <option value="Rajkot">Rajkot</option>
+              <option value="Ranchi">Ranchi</option>
+              <option value="Salem">Salem</option>
+              <option value="Sikkim">Sikkim</option>
+              <option value="Siliguri">Siliguri</option>
+              <option value="Sivakasi">Sivakasi</option>
+              <option value="Surat">Surat</option>
+              <option value="Thoothukudi">Thoothukudi</option>
+              <option value="Tirupur">Tirupur</option>
+              <option value="Tirupur">Tirupati</option>
+              <option value="Trichy">Trichy</option>
+              <option value="Trivandrum">Trivandrum</option>
+              <option value="Vadodara">Vadodara</option>
+              <option value="Varanasi">Varanasi</option>
+              <option value="Vellore">Vellore</option>
+              <option value="Vizag">Vizag</option>
+            </select>
             </div>
             <div className="flex-1 min-w-[180px]">
               <label className="block text-sm font-medium mb-1">School</label>
@@ -620,150 +620,150 @@ const handleGenerateCertificates = async () => {
           <div className="mb-12 border-t-4 border-blue-500 pt-6">
             <h3 className="text-xl font-bold text-gray-800 mb-4">Submission {currentSubmissionIndex + 1} of {allSubmissionsData.length}</h3>
 
-            <div className="bg-[#fdf5eb] shadow-xl rounded-2xl p-4 mb-8">
-              <div className="hidden md:flex items-center">
-                <p className="text-gray-800 font-semibold text-base mr-8 min-w-[260px]">Were you riding with a parent?</p>
+        <div className="bg-[#fdf5eb] shadow-xl rounded-2xl p-4 mb-8">
+          <div className="hidden md:flex items-center">
+            <p className="text-gray-800 font-semibold text-base mr-8 min-w-[260px]">Were you riding with a parent?</p>
                 <div className="flex items-center gap-11 ml-[165px]">
-                  {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
+              {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
                     const isAnswered = currentSubmission.parentRideAnswers[rideIdx];
-                    return (
-                      <div
-                        key={rideIdx}
-                        onClick={() => handleParentToggle(rideIdx)}
-                        className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
-                          isAnswered ? "bg-green-500" : "bg-red-500"
+                return (
+                  <div
+                    key={rideIdx}
+                    onClick={() => handleParentToggle(rideIdx)}
+                    className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
+                      isAnswered ? "bg-green-500" : "bg-red-500"
                         } ${!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
                         disabled={!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn}
-                      >
-                        <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
-                        <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
-                        <div
-                          className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                            isAnswered ? "translate-x-full" : "translate-x-0"
-                          }`}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-              <div className="md:hidden flex flex-col items-center gap-4">
-                <p className="text-gray-800 font-semibold text-base mb-2 text-center">Were you riding with a parent?</p>
-                <div className="flex flex-nowrap justify-center gap-3 overflow-x-auto w-full pb-2">
-                  {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
-                    const isAnswered = currentSubmission.parentRideAnswers[rideIdx];
-                    return (
-                      <div
-                        key={rideIdx}
-                        onClick={() => handleParentToggle(rideIdx)}
-                        className={`relative w-12 h-5 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
-                          isAnswered ? "bg-green-500" : "bg-red-500"
-                        } ${!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
-                        disabled={!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn}
-                      >
-                        <div
-                          className={`absolute w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                            isAnswered ? "translate-x-7" : "translate-x-0"
-                          }`}
-                        />
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
+                  >
+                    <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
+                    <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
+                    <div
+                      className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                        isAnswered ? "translate-x-full" : "translate-x-0"
+                      }`}
+                    />
+                  </div>
+                );
+              })}
             </div>
+          </div>
+          <div className="md:hidden flex flex-col items-center gap-4">
+            <p className="text-gray-800 font-semibold text-base mb-2 text-center">Were you riding with a parent?</p>
+            <div className="flex flex-nowrap justify-center gap-3 overflow-x-auto w-full pb-2">
+              {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
+                    const isAnswered = currentSubmission.parentRideAnswers[rideIdx];
+                return (
+                  <div
+                    key={rideIdx}
+                    onClick={() => handleParentToggle(rideIdx)}
+                    className={`relative w-12 h-5 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
+                      isAnswered ? "bg-green-500" : "bg-red-500"
+                        } ${!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        disabled={!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn}
+                  >
+                    <div
+                      className={`absolute w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                        isAnswered ? "translate-x-7" : "translate-x-0"
+                      }`}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
 
-            <div className="md:hidden bg-[#fdf5eb] shadow-xl rounded-2xl p-4">
-              <div className="flex items-center gap-2 mb-2 font-bold text-gray-600 text-sm">
-                {Array.from({ length: TOTAL_RIDES }, (_, i) => (
+        <div className="md:hidden bg-[#fdf5eb] shadow-xl rounded-2xl p-4">
+          <div className="flex items-center gap-2 mb-2 font-bold text-gray-600 text-sm">
+            {Array.from({ length: TOTAL_RIDES }, (_, i) => (
                   <span key={i} className="w-10 text-center flex items-center justify-center">
-                    {i + 1}
-                  </span>
-                ))}
-              </div>
-              <div className="flex items-center gap-4 mb-4">
-                <div className="flex items-center gap-1">
-                  <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
-                  <span className="text-xs text-gray-700">Yes</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-                  <span className="text-xs text-gray-700">No</span>
-                </div>
-              </div>
-              {questions.map((question, qIdx) => (
-                <div key={qIdx} className="mb-4 border-t pt-4">
-                  <p className="text-gray-800 font-medium text-sm mb-2">{question}</p>
-                  <div className="flex items-center gap-2">
-                    {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
+                {i + 1}
+              </span>
+            ))}
+          </div>
+          <div className="flex items-center gap-4 mb-4">
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+              <span className="text-xs text-gray-700">Yes</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+              <span className="text-xs text-gray-700">No</span>
+            </div>
+          </div>
+          {questions.map((question, qIdx) => (
+            <div key={qIdx} className="mb-4 border-t pt-4">
+              <p className="text-gray-800 font-medium text-sm mb-2">{question}</p>
+              <div className="flex items-center gap-2">
+                {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
                       const isAnswered = currentSubmission.ridesAnswers[rideIdx][qIdx];
-                      return (
-                        <div
-                          key={rideIdx}
-                          onClick={() => handleToggle(rideIdx, qIdx)}
-                          className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
-                            isAnswered ? "bg-green-500" : "bg-red-500"
+                  return (
+                    <div
+                      key={rideIdx}
+                      onClick={() => handleToggle(rideIdx, qIdx)}
+                      className={`relative w-10 h-5 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
+                        isAnswered ? "bg-green-500" : "bg-red-500"
                           } ${!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
                           disabled={!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn}
+                    >
+                      <div
+                        className={`absolute w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                          isAnswered ? "translate-x-5" : "translate-x-0"
+                        }`}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="overflow-auto hidden md:block">
+          <table className="table-auto w-full border-collapse bg-[#fdf5eb] shadow-xl rounded-2xl overflow-hidden">
+            <thead className="bg-[#fdf6bf]">
+              <tr>
+                <th className="text-left p-4 text-gray-700">Questions</th>
+                {Array.from({ length: TOTAL_RIDES }, (_, i) => (
+                  <th key={i} className="text-center p-4 text-gray-700">
+                      {`Ride ${i + 1}`}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {questions.map((question, qIdx) => (
+                <tr key={qIdx} className="border-t">
+                  <td className="p-4 text-sm font-medium text-gray-800">{question}</td>
+                  {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
+                        const isAnswered = currentSubmission.ridesAnswers[rideIdx][qIdx];
+                    return (
+                      <td key={rideIdx} className="p-4 text-center">
+                        <div
+                          onClick={() => handleToggle(rideIdx, qIdx)}
+                          className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 mx-auto flex items-center px-1 ${
+                            isAnswered ? "bg-green-500" : "bg-red-500"
+                              } ${!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
+                              disabled={!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn}
                         >
+                          <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
+                          <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
                           <div
-                            className={`absolute w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                              isAnswered ? "translate-x-5" : "translate-x-0"
+                            className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                              isAnswered ? "translate-x-full" : "translate-x-0"
                             }`}
                           />
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
+                      </td>
+                    );
+                  })}
+                </tr>
               ))}
-            </div>
+            </tbody>
+          </table>
+        </div>
 
-            <div className="overflow-auto hidden md:block">
-              <table className="table-auto w-full border-collapse bg-[#fdf5eb] shadow-xl rounded-2xl overflow-hidden">
-                <thead className="bg-[#fdf6bf]">
-                  <tr>
-                    <th className="text-left p-4 text-gray-700">Questions</th>
-                    {Array.from({ length: TOTAL_RIDES }, (_, i) => (
-                      <th key={i} className="text-center p-4 text-gray-700">
-                        {`Ride ${i + 1}`}
-                      </th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {questions.map((question, qIdx) => (
-                    <tr key={qIdx} className="border-t">
-                      <td className="p-4 text-sm font-medium text-gray-800">{question}</td>
-                      {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
-                        const isAnswered = currentSubmission.ridesAnswers[rideIdx][qIdx];
-                        return (
-                          <td key={rideIdx} className="p-4 text-center">
-                            <div
-                              onClick={() => handleToggle(rideIdx, qIdx)}
-                              className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 mx-auto flex items-center px-1 ${
-                                isAnswered ? "bg-green-500" : "bg-red-500"
-                              } ${!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
-                              disabled={!isStudentInfoComplete || currentSubmission.isSubmitted || !isLoggedIn}
-                            >
-                              <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
-                              <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
-                              <div
-                                className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                                  isAnswered ? "translate-x-full" : "translate-x-0"
-                                }`}
-                              />
-                            </div>
-                          </td>
-                        );
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            <Ex_Zone
+        <Ex_Zone
               answers={currentSubmission.experienceAnswers}
               setAnswers={(answers) => setAllSubmissionsData(prev => {
                 const newData = [...prev];
@@ -810,23 +810,23 @@ const handleGenerateCertificates = async () => {
           )}
 
           {currentSubmissionIndex === allSubmissionsData.length - 1 && allSubmissionsData.length > 0 && (
-            <button
+          <button
               onClick={handleSubmitAll}
               disabled={isSubmitAllButtonDisabled}
-              className={`px-6 py-3 rounded-xl font-bold text-white transition-colors duration-300 ${
+            className={`px-6 py-3 rounded-xl font-bold text-white transition-colors duration-300 ${
                 !isSubmitAllButtonDisabled ? "bg-green-600 hover:bg-green-700" : "bg-gray-400 cursor-not-allowed"
-              }`}
-            >
+            }`}
+          >
               Submit All Submissions
-            </button>
+          </button>
           )}
 
           <button
               onClick={handleGenerateCertificates}
               disabled={isGenerateCertificatesButtonDisabled}
-              className={`px-6 py-3 rounded-xl font-bold text-white transition-colors duration-300 ${
+            className={`px-6 py-3 rounded-xl font-bold text-white transition-colors duration-300 ${
                   !isGenerateCertificatesButtonDisabled ? "bg-blue-600 hover:bg-blue-700" : "bg-gray-400 cursor-not-allowed"
-              }`}
+            }`}
           >
               Generate Certificates
           </button>
