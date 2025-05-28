@@ -23,7 +23,7 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
   if (hideAuthLinks && showHomeOnQuestions) {
     sessionLinks.push(
       <Link key="home" to="/" className="text-blue-600 font-semibold hover:underline">
-        Home
+        {/* Home */}
       </Link>
     );
   } else if (!hideAuthLinks) {
@@ -41,7 +41,7 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
       if (currentPath === '/admin') {
         sessionLinks.unshift(
           <Link key="home-on-admin" to="/" className="text-blue-600 font-semibold hover:underline">
-            Home
+            {/* Home */}
           </Link>
         );
       } else if (isHomepage) {
@@ -53,7 +53,7 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
       } else if (showHomeLink) {
         sessionLinks.unshift(
           <Link key="home-general" to="/" className="text-blue-600 font-semibold hover:underline">
-            Home
+            {/* Home */}
           </Link>
         );
       }
@@ -61,7 +61,7 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
       if (!isHomepage) {
         sessionLinks.push(
           <Link key="home" to="/" className="text-blue-600 font-semibold hover:underline">
-            Home
+            {/* Home */}
           </Link>
         );
       }
@@ -69,7 +69,7 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
       if (currentPath !== '/signin' && currentPath !== '/signup') {
           sessionLinks.push(
               <Link key="admin-dashboard-unauth" to="/admin" className="text-blue-600 font-semibold hover:underline">
-                  Admin
+                  {/* Admin */}
               </Link>
           );
       }
@@ -78,7 +78,7 @@ function Header({ hideAuthLinks, showHomeLink, isHomepage, showHomeOnQuestions }
               Sign In
         </Link>,
         <Link key="signup" to="/signup" className="text-purple-700 font-medium hover:underline">
-              Sign Up
+              {/* Sign Up */}
             </Link>
       );
     }

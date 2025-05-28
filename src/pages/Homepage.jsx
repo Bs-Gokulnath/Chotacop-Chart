@@ -7,7 +7,7 @@ const Homepage = () => {
     <div className="flex flex-col min-h-screen bg-orange-50">
       <Header isHomepage={true} />
       <div className="flex flex-grow items-center justify-center p-4 mt-[-130px]">
-        <div className="flex flex-wrap justify-center items-center gap-10">
+        <div className="flex flex-wrap justify-center items-center gap-4 md:gap-10">
           {/* Wrap the first logo in a Link to navigate to /questions */}
           <Link to="/questions">
             <img

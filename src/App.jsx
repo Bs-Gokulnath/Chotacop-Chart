@@ -18,6 +18,7 @@ function App() {
       <Routes>
           {/* <Route path='/' element={<ChotaCopPage />} /> */}
           <Route path='/' element={<Homepage />} />
+          {/* <Route path='/' element={<AdminHomepage />} /> */}
           <Route path="/signin" element={<Signin />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/analyze" element={<Analyze />} />

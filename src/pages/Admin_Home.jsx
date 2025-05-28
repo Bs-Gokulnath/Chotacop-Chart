@@ -17,14 +17,14 @@ const AdminHomepage = () => {
             />
             <p className="text-center text-xl font-bold">Analyze</p>
           </Link>
-          <Link to="/bulk">
+          {/* <Link to="/bulk">
             <img
               src="/assets/submit.png"
               alt="Chota Cop Logo"
               className="w-40 h-auto hover:opacity-80 transition-opacity cursor-pointer"
             />
             <p className="text-center text-xl font-bold ">Bulk Submission </p>
-          </Link>
+          </Link> */}
         </div>
       </div>
     </div>

@@ -93,47 +93,47 @@ const PreviewModal = ({ show, onClose }) => {
                         <thead>
                             <tr>
                                 <th className="border px-4 py-2 text-left">A</th>
-                                <th className="border px-4 py-2 text-left">B</th>
+                                {/* <th className="border px-4 py-2 text-left">B</th>
                                 <th className="border px-4 py-2 text-left">C</th>
-                                <th className="border px-4 py-2 text-left">D</th>
+                                <th className="border px-4 py-2 text-left">D</th> */}
                             </tr>
                         </thead>
                         <tbody>
                             <tr>
                                 <td className="border px-4 py-2">Name</td>
+                                {/* <td className="border px-4 py-2"></td>
                                 <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td> */}
                             </tr>
                             <tr>
                                 <td className="border px-4 py-2">Student Name1</td>
+                                {/* <td className="border px-4 py-2"></td>
                                 <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td> */}
                             </tr>
                             <tr>
                                 <td className="border px-4 py-2">Student Name2</td>
+                                {/* <td className="border px-4 py-2"></td>
                                 <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td> */}
                             </tr>
                             <tr>
                                 <td className="border px-4 py-2">Student Name3</td>
+                                {/* <td className="border px-4 py-2"></td>
                                 <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td> */}
                             </tr>
                             <tr>
                                 <td className="border px-4 py-2">Student Name4</td>
+                                {/* <td className="border px-4 py-2"></td>
                                 <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td> */}
                             </tr>
                             <tr>
                                 <td className="border px-4 py-2">Student Name5</td>
+                                {/* <td className="border px-4 py-2"></td>
                                 <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
-                                <td className="border px-4 py-2"></td>
+                                <td className="border px-4 py-2"></td> */}
                             </tr>
                         </tbody>
                     </table>
@@ -584,13 +584,13 @@ const handleGenerateCertificates = async () => {
                 disabled={!isLoggedIn}
               />
             </div>
-            <div className="flex-1 min-w-[180px]">
+            <div className="w-40">
               <label className="block text-sm font-medium mb-1">Class</label>
               <input type="text" name="class" placeholder="Class" value={studentInfo.class} onChange={handleStudentInfoChange} className={`w-full border border-gray-300 rounded-lg px-4 py-2 ${!isLoggedIn ? 'opacity-50 cursor-not-allowed' : ''}`}
                 disabled={!isLoggedIn}
               />
             </div>
-            <div className="flex-1 min-w-[180px]">
+            <div className="w-48">
               <label className="block text-sm font-medium mb-1">Number of Submissions</label>
               <input
                 type="number"
@@ -606,11 +606,11 @@ const handleGenerateCertificates = async () => {
                 <ExcelUploaderPlaceholder disabled={!isLoggedIn} onNamesExtracted={handleNamesExtracted} />
                  <button
                      onClick={() => setShowPreviewModal(true)}
-                     className="p-2 bg-gray-200 text-gray-700 rounded-full hover:bg-gray-300 transition disabled:opacity-50 flex items-center justify-center"
+                     className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center text-sm font-semibold"
                       disabled={!isLoggedIn}
                       title="Preview Excel Format"
                   >
-                      👁️
+                      View Sample
                   </button>
              </div>
           </div>

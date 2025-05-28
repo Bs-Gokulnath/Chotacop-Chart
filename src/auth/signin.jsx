@@ -99,7 +99,7 @@ const Signin = () => {
     );
 
     alert("Sign-in successful!");
-    navigate("/admin");
+    navigate("/analyze");
   };
 
   return (

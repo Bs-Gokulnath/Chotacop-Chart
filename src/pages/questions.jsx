@@ -275,6 +275,15 @@ const QuestionTogglePage = () => {
 
   const isStudentInfoComplete = Object.values(studentInfo).every((v) => v.trim() !== "");
 
+  const handleDownloadReportCard = () => {
+    const link = document.createElement('a');
+    link.href = '/assets/Final Card.pdf'; // Path to your PDF file in the public directory
+    link.download = 'ChotaCop_ReportCard.pdf'; // Suggested filename for the downloaded file
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="min-h-screen bg-[#fdf5eb]">
       <Header hideAuthLinks={true} showHomeOnQuestions={true} />
@@ -362,12 +371,24 @@ const QuestionTogglePage = () => {
             </select>
             <input type="text" name="name" placeholder="Name" value={studentInfo.name} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2" />
             <input type="text" name="school" placeholder="School" value={studentInfo.school} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2" />
-            <select name="class" value={studentInfo.class} onChange={handleInputChange} className="flex-1 min-w-[180px] border border-gray-300 rounded-lg px-4 py-2">
-              <option value="">Select Class</option>
-              {Array.from({ length: 12 }, (_, i) => (
-                <option key={i + 1} value={i + 1}>{`Class ${i + 1}`}</option>
-              ))}
-            </select>
+            {/* Wrap Class and Button for mobile side-by-side layout */}
+            <div className="flex items-center gap-4 flex-1 min-w-[180px]">
+              <select name="class" value={studentInfo.class} onChange={handleInputChange} className="flex-initial w-32 border border-gray-300 rounded-lg px-4 py-2">
+                <option value="">Select Class</option>
+                {Array.from({ length: 12 }, (_, i) => (
+                  <option key={i + 1} value={i + 1}>{`Class ${i + 1}`}</option>
+                ))}
+              </select>
+              {/* Chota Cop Report Card Button */}
+              <button
+                type="button"
+                onClick={handleDownloadReportCard}
+                className="px-2 py-2 bg-purple-600 text-white rounded-lg text-sm font-semibold hover:bg-purple-700 transition"
+                title="Download Chota Cop Report Card"
+              >
+                Chota Cop Card
+              </button>
+            </div>
           </div>
         </div>
 
