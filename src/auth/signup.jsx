@@ -51,7 +51,7 @@ const Signup = () => {
       console.log("Generated OTP (for dev):", otpToSend);
 
       const response = await axios.post(
-        "http://148.135.137.228:5001/send-otp",
+        "https://chotacop.in/api/send-otp",
         { email, otp: otpToSend },
         { headers: { "Content-Type": "application/json" }, timeout: 10000 }
       );
@@ -91,7 +91,7 @@ const Signup = () => {
 
     try {
       const response = await axios.post(
-        "http://148.135.137.228:5001/signup",
+        "https://chotacop.in/api/signup",
         { email, chapter_name: chapter },
         { headers: { "Content-Type": "application/json" }, timeout: 10000 }
       );

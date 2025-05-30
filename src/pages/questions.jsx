@@ -129,7 +129,7 @@ const QuestionTogglePage = () => {
     data["c5"] = parentZoneAnswers[0] ? 1 : 0;
 
     try {
-      await axios.post("http://148.135.137.228:5001/upload", data, {
+      await axios.post("https://chotacop.in/api/upload", data, {
         headers: { "Content-Type": "application/json" },
       });
     } catch (err) {
@@ -197,7 +197,7 @@ const QuestionTogglePage = () => {
     formData.append("file", file);
     formData.append("email", studentInfo.email);
     try {
-      await axios.post("http://148.135.137.228:5001/send-pdf", formData, {
+      await axios.post("https://chotacop.in/api/send-pdf", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
     } catch (err) {
@@ -217,12 +217,12 @@ const QuestionTogglePage = () => {
     if (!email) return alert("Please enter an email.");
     setCheckingEmail(true);
     try {
-      const res = await axios.post("http://148.135.137.228:5001/check-mail", { email }, {
+      const res = await axios.post("https://chotacop.in/api/check-mail", { email }, {
         headers: { "Content-Type": "application/json" },
       });
       if (res.data.exists) {
         // Fetch full data for this email
-        const dataRes = await axios.post("http://148.135.137.228:5001/email-data", { email }, {
+        const dataRes = await axios.post("https://chotacop.in/api/email-data", { email }, {
           headers: { "Content-Type": "application/json" },
         });
         const info = dataRes.data.data && dataRes.data.data[0];

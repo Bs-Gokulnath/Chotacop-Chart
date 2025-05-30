@@ -4,7 +4,7 @@ import QuestionMatrix from "./QuestionMatrix";
 import ResponseBoxes from "./ResponseBoxes";
 
 // Updated API endpoint
-const API_ENDPOINT = "http://148.135.137.228:5001/chapter-data";
+const API_ENDPOINT = "https://chotacop.in/api/chapter-data";
 
 const SchoolSelector = ({ selectedChapter, setSelectedChapter, selectedSchool, setSelectedSchool }) => {
   const [schools, setSchools] = useState([]);

@@ -449,7 +449,7 @@ const handleGenerateCertificates = async () => {
     });
 
     try {
-      await axios.post("http://148.135.137.228:5001/bulk-upload", dataToSend, {
+      await axios.post("https://chotacop.in/api/bulk-upload", dataToSend, {
         headers: { "Content-Type": "application/json" },
       });
 

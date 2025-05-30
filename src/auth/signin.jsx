@@ -31,7 +31,7 @@ const Signin = () => {
     setGeneratedOtp(newOtp);
 
     try {
-      const response = await axios.post("http://148.135.137.228:5001/send-otp", {
+      const response = await axios.post("https://chotacop.in/api/send-otp", {
         email,
         otp: newOtp,
       });
@@ -53,7 +53,7 @@ const Signin = () => {
     if (!email) return alert("Please enter your email.");
 
     try {
-      const response = await axios.post("http://148.135.137.228:5001/signin", { email });
+      const response = await axios.post("https://chotacop.in/api/signin", { email });
 
       if (response.data?.email) {
         setChapter(response.data.chapter); // ✅ Corrected
