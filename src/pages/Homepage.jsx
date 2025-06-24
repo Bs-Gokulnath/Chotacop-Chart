@@ -16,15 +16,23 @@ const Homepage = () => {
               className="w-40 h-auto hover:opacity-80 transition-opacity cursor-pointer"
             />
           </Link>
-          <img
+          {/* <img
             src="/assets/Yi-QuizSample.png"
             alt="Quiz Logo"
             className="w-40 h-auto"
-          />
+          /> */}
           <img
             src="/assets/Yi-CZ%20Sample.png"
             alt="Colouring Zone Logo"
-            className="w-40 h-auto"
+            className="w-40 h-auto cursor-pointer"
+            onClick={() => {
+              const link = document.createElement('a');
+              link.href = '/assets/Yi Coloring Book-2024.pdf';
+              link.download = 'Yi_Coloring_Book_2024.pdf';
+              document.body.appendChild(link);
+              link.click();
+              document.body.removeChild(link);
+            }}
           />
         </div>
       </div>

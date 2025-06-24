@@ -77,9 +77,26 @@ const QuestionTogglePage = () => {
 
   const handleRideCheckbox = (idx) => {
     setRideActive((prev) => {
-      const updated = [...prev];
-      updated[idx] = !updated[idx];
-      return updated;
+      // Only allow checking the next ride if all previous rides are checked
+      if (!prev[idx]) {
+        // Trying to check (activate) this ride
+        if (idx === 0 || prev[idx - 1]) {
+          return prev.map((v, i) => (i === idx ? true : v));
+        } else {
+          alert(`Please activate Ride ${idx} before activating Ride ${idx + 1}.`);
+          return prev;
+        }
+      } else {
+        // Trying to uncheck (deactivate) this ride
+        // Prevent unchecking if any subsequent rides are checked
+        const anyLaterChecked = prev.slice(idx + 1).some(Boolean);
+        if (anyLaterChecked) {
+          alert(`Please deactivate all rides after Ride ${idx + 1} first.`);
+          return prev;
+        } else {
+          return prev.map((v, i) => (i === idx ? false : v));
+        }
+      }
     });
   };
 
@@ -394,26 +411,30 @@ const QuestionTogglePage = () => {
 
         {/* Were you riding with a parent? */}
         <div className="bg-[#fdf5eb] shadow-xl rounded-2xl p-4 mb-8">
-          <div className="hidden md:flex items-center">
-            <p className="text-gray-800 font-semibold text-base mr-8 min-w-[260px]">Were you riding with a parent?</p>
-            <div className="flex items-center gap-20 ml-[215px]">
+          <div className="hidden md:block overflow-x-auto">
+            <div className="min-w-[900px] grid grid-cols-[300px_repeat(7,1fr)] gap-x-4 items-center">
+              <p className="text-gray-800 font-semibold text-base">Were you riding with a parent?</p>
               {Array.from({ length: TOTAL_RIDES }, (_, rideIdx) => {
                 const isAnswered = parentRideAnswers[rideIdx];
                 return (
                   <div
                     key={rideIdx}
-                    onClick={() => handleParentToggle(rideIdx)}
-                    className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
-                      isAnswered ? "bg-green-500" : "bg-red-500"
-                    }`}
+                    className="flex justify-center"
                   >
-                    <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
-                    <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
                     <div
-                      className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                        isAnswered ? "translate-x-full" : "translate-x-0"
+                      onClick={() => handleParentToggle(rideIdx)}
+                      className={`relative w-14 h-6 rounded-full cursor-pointer transition-colors duration-300 flex items-center px-1 ${
+                        isAnswered ? "bg-green-500" : "bg-red-500"
                       }`}
-                    />
+                    >
+                      <span className="text-white text-xs font-bold w-1/2 text-center z-10">Y</span>
+                      <span className="text-white text-xs font-bold w-1/2 text-center z-10">N</span>
+                      <div
+                        className={`absolute w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                          isAnswered ? "translate-x-full" : "translate-x-0"
+                        }`}
+                      />
+                    </div>
                   </div>
                 );
               })}
